@@ -36,6 +36,6 @@ W3Schools: https://www.w3schools.com
 Microsoft: https://learn.microsoft.com/vi-vn/docs
 
 ## Thành viên
-  * 201200304
+  * 22A1001D0003
   
-#### 2023. Đại học Giao thông Vận tải
+#### 2025. Trường đại học Mở Hà Nội
