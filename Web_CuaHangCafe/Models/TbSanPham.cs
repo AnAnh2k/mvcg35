@@ -30,7 +30,7 @@ public partial class TbSanPham
 
     [ForeignKey("MaNhomSp")]
     [InverseProperty("TbSanPhams")]
-    public virtual TbNhomSanPham MaNhomSpNavigation { get; set; } = null!;
+    public virtual TbNhomSanPham? MaNhomSpNavigation { get; set; } 
 
     [InverseProperty("MaSanPhamNavigation")]
     public virtual ICollection<TbChiTietHoaDonBan> TbChiTietHoaDonBans { get; set; } = new List<TbChiTietHoaDonBan>();

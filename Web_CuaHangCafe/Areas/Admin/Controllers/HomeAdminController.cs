@@ -16,12 +16,12 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
     public class HomeAdminController : Controller
     {
         private readonly Data.ApplicationDbContext _context;
-        IWebHostEnvironment hostEnvironment;
+        IWebHostEnvironment _hostEnvironment;
 
         public HomeAdminController(Data.ApplicationDbContext context, IWebHostEnvironment hc)
         {
             _context = context;
-            hostEnvironment = hc;
+            _hostEnvironment = hc;
         }
 
         [Route("")]
@@ -67,68 +67,125 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             return View(pagedListItem);
         }
 
+        // GET: /Access1/Create
         [Route("Create")]
-        [Authentication]
         [HttpGet]
         public IActionResult Create()
         {
+            // Nạp danh sách nhóm sản phẩm vào ViewBag để tạo dropdown
             ViewBag.MaNhomSp = new SelectList(_context.TbNhomSanPhams.ToList(), "MaNhomSp", "TenNhomSp");
-
             return View();
         }
 
+        // POST: /Access1/Create
+        //[Route("Create")]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Create(TbSanPham sanPham, IFormFile imageFile)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        // Nếu không hợp lệ, nạp lại dropdown
+        //        ViewBag.MaNhomSp = new SelectList(_context.TbNhomSanPhams.ToList(), "MaNhomSp", "TenNhomSp");
+        //        return View(sanPham);
+        //    }
+
+        //    // Nếu có file hình ảnh được upload
+        //    if (imageFile != null && imageFile.Length > 0)
+        //    {
+        //        // Lấy đường dẫn upload: wwwroot/img/products
+        //        string uploadFolder = Path.Combine(_hostEnvironment.WebRootPath, "img", "products");
+        //        if (!Directory.Exists(uploadFolder))
+        //        {
+        //            Directory.CreateDirectory(uploadFolder);
+        //        }
+
+        //        // Tạo tên file duy nhất
+        //        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(imageFile.FileName);
+        //        string filePath = Path.Combine(uploadFolder, uniqueFileName);
+
+        //        // Lưu file vào đường dẫn trên
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //            imageFile.CopyTo(stream);
+        //        }
+
+        //        // Gán tên file (hoặc đường dẫn tương đối) cho thuộc tính HinhAnh của sản phẩm
+        //        sanPham.HinhAnh = uniqueFileName;
+        //    }
+
+        //    // Thêm sản phẩm vào cơ sở dữ liệu
+        //    _context.TbSanPhams.Add(sanPham);
+        //    int kq = _context.SaveChanges();
+        //    if (kq > 0)
+        //    {
+        //        TempData["Message"] = "Thêm sản phẩm thành công";
+        //    }
+        //    else
+        //    {
+        //        TempData["Message"] = "Không thêm được sản phẩm";
+        //    }
+
+        //    // Chuyển hướng đến trang Index của HomeAdmin
+        //    return RedirectToAction("Index", "HomeAdmin");
+        //}
         [Route("Create")]
-        [Authentication]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(TbSanPham sanPham, IFormFile imageFile)
+        public IActionResult Create(SanPhamViewModel model)
         {
-            //string fileName = "";
-
-            //if (createProduct.HinhAnh != null)
-            //{
-            //    string uploadFolder = Path.Combine(Path.Combine(hostEnvironment.WebRootPath, "img"), "products");
-            //    fileName = createProduct.HinhAnh.FileName;
-            //    string filePath = Path.Combine(uploadFolder, fileName);
-            //    createProduct.HinhAnh.CopyTo(new FileStream(filePath, FileMode.Create));
-            //}
-
-            //var product = new TbSanPham
-            //{
-            //    MaSanPham = createProduct.MaSanPham,
-            //    TenSanPham = createProduct.TenSanPham,
-            //    GiaBan = createProduct.GiaBan,
-            //    MoTa = createProduct.MoTa,
-            //    HinhAnh = fileName,
-            //    GhiChu = createProduct.GhiChu,
-            //    MaNhomSp = createProduct.MaLoaiSanPham
-            //};
-
-            if (imageFile != null && imageFile.Length > 0)
+            if (!ModelState.IsValid)
             {
-                // Đối với mục đích minh họa, chúng ta sẽ lưu ảnh vào thư mục Images trong wwwroot
-                string uploadFolder = Path.Combine(Path.Combine(hostEnvironment.WebRootPath, "img"), "products");
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                ViewBag.MaNhomSp = new SelectList(_context.TbNhomSanPhams.ToList(), "MaNhomSp", "TenNhomSp");
+                return View(model);
+            }
+
+            // Nếu tên sản phẩm đã tồn tại, thêm timestamp để tạo tên riêng biệt
+            string tenSanPham = model.TenSanPham;
+            if (_context.TbSanPhams.Any(p => p.TenSanPham.ToLower() == tenSanPham.ToLower()))
+            {
+                tenSanPham = $"{tenSanPham}_{DateTime.Now:yyyyMMddHHmmssfff}";
+            }
+
+
+            TbSanPham sanPham = new TbSanPham
+            {
+                TenSanPham = tenSanPham,
+                GiaBan = model.GiaBan,
+                MoTa = model.MoTa,
+                GhiChu = model.GhiChu,
+                MaNhomSp = model.MaNhomSp
+                // Hình ảnh sẽ được gán sau khi xử lý file upload
+            };
+
+            // Xử lý file upload (nếu có)
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                string uploadFolder = Path.Combine(_hostEnvironment.WebRootPath, "img", "products");
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.ImageFile.FileName);
                 string filePath = Path.Combine(uploadFolder, uniqueFileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    imageFile.CopyTo(stream);
+                    model.ImageFile.CopyTo(stream);
                 }
 
-                // Lưu đường dẫn hoặc thông tin về ảnh vào cơ sở dữ liệu nếu cần
-                // Ví dụ: lưu đường dẫn filePath vào cơ sở dữ liệu
-                // ...
-
-                return RedirectToAction("Index");
+                sanPham.HinhAnh = uniqueFileName;
             }
 
-            //db.TbSanPhams.Add(product);
-            _context.SaveChanges();
-            TempData["Message"] = "Thêm sản phẩm thành công";
+            _context.TbSanPhams.Add(sanPham);
+            int kq = _context.SaveChanges();
 
+            TempData["Message"] = kq > 0 ? "Thêm sản phẩm thành công" : "Không thêm được sản phẩm";
             return RedirectToAction("Index", "HomeAdmin");
         }
+
+
 
         [Route("Details")]
         [Authentication]
@@ -177,7 +234,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 
             if (createProduct.HinhAnh != null)
             {
-                string uploadFolder = Path.Combine(Path.Combine(hostEnvironment.WebRootPath, "img"), "products");
+                string uploadFolder = Path.Combine(Path.Combine(_hostEnvironment.WebRootPath, "img"), "products");
                 fileName = createProduct.HinhAnh.FileName;
                 string filePath = Path.Combine(uploadFolder, fileName);
                 createProduct.HinhAnh.CopyTo(new FileStream(filePath, FileMode.Create));

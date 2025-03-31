@@ -7,51 +7,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] | THE SPACE COFFEE</title>
 
-    <!--Favicon-->
+    <!-- Favicon -->
     <link rel="shortcut icon" href="~/favicon.ico" />
 
-    <!-- Icon Font Stylesheet -->
-
-    <!--Bootstrap-->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" type="text/css">
 
-    <!--Font Awesome-->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" />
 
-    <!--JQuery-->
+    <!-- Các thư viện CSS khác -->
     <link rel="stylesheet" href="~/lib/jquery-ui/jquery-ui.min.css" type="text/css">
     <link rel="stylesheet" href="~/lib/magnific-popup/dist/magnific-popup.css" type="text/css">
     <link rel="stylesheet" href="~/lib/owl-carousel-2/dist/assets/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="~/lib/owl-carousel-2/dist/assets/owl.theme.default.min.css" type="text/css">
     <link rel="stylesheet" href="~/lib/slick-nav/dist/slicknav.min.css" type="text/css">
 
-    <!--CSS-->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/style.css" type="text/css" asp-append-version="true">
     <link rel="stylesheet" href="~/css/style-additional.css" type="text/css" asp-append-version="true">
 
+
 </head>
 <body>
-    <!--Page Preloder-->
+    <!-- Page Preloader -->
     <partial name="_PreloaderPartial" />
 
-    <!--Header Section-->
+    <!-- Header Section -->
     <partial name="_HeaderPartial" />
 
-    <!--Main Body-->
+    <!-- Main Body -->
     @RenderBody()
 
-    <!--Instagram-->
+    <!-- Instagram -->
     <partial name="_InstagramPartial" />
 
-    <!--Footer Section-->
+    <!-- Footer Section -->
     <partial name="_FooterPartial" />
-    
-    <!--Search-->
+
+    <!-- Search -->
     <partial name="_SearchBoxPartial" />
-    
-    <!--Back to top -->
+
+    <!-- Back to Top -->
     <partial name="_BackToTopPartial" />
-    
+
     <!-- JavaScript Libraries -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/magnific-popup/dist/jquery.magnific-popup.min.js"></script>
@@ -62,14 +61,19 @@
     <script src="~/lib/owl-carousel-2/dist/owl.carousel.min.js"></script>
     <script src="~/lib/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Bootstrap Bundle (includes Popper.js) từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2LcCE5ZZZcxOc6DeScwEo+G5yE/l1F6qqg1Gjk3t9"
+            crossorigin="anonymous"></script>
 
     <script src="~/lib/fontawesome/js/all.min.js"></script>
 
-    <!--Template Javascript-->
+    <!-- Template Javascript -->
     <script src="~/js/main.js" asp-append-version="true"></script>
     <script src="~/js/main-additional.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+

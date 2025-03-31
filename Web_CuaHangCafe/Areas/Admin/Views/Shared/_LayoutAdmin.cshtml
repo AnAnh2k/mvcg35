@@ -41,7 +41,7 @@
             <div class="navbar-menu-wrapper d-flex align-items-stretch">
                 <ul class="navbar-nav navbar-nav-right">
                     <li class="nav-item nav-item-logout">
-                        <a asp-controller="access" asp-action="logout" class="nav-link">
+                        <a asp-controller="access1" asp-action="logout" class="nav-link">
                             <i class="fas fa-sign-out-alt"></i>
                             <span class="menu-title" style="padding-left:10px;">Đăng xuất</span>
                         </a>
@@ -87,9 +87,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a asp-controller="Feedback" asp-action="Index" class="nav-link">
+                        <a asp-controller="QuanCafe" asp-action="Index" class="nav-link">
                             <i class="fas fa-comments"></i>
-                            <span class="menu-title">Tiếp nhận phản hồi</span>
+                            <span class="menu-title">Quản lí thông tin của hàng</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -99,7 +99,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a asp-controller="Access" asp-action="Logout" class="nav-link">
+                        <a asp-controller="Access1" asp-action="Logout" class="nav-link">
                             <i class="fas fa-sign-out-alt"></i>
                             <span class="menu-title">Đăng xuất</span>
                         </a>
@@ -143,5 +143,7 @@
     <script src="~/js/misc.js"></script>
     <script src="~/js/main-admin.js" asp-append-version="true"></script>
     <script src="~/js/main-admin-additional.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
 </body>
 </html>

@@ -36,7 +36,7 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<TbPhieuNhapHang> TbPhieuNhapHangs { get; set; }
 
-    public virtual DbSet<TbQuanCafe> TbQuanCaves { get; set; }
+    public virtual DbSet<TbQuanCafe> TbQuanCafes { get; set; }
 
     public virtual DbSet<TbQuanTriVien> TbQuanTriViens { get; set; }
 

@@ -1,4 +1,4 @@
-﻿@model Web_CuaHangCafe.Models.TbQuanTriVien
+﻿@model Web_CuaHangCafe.Models.TbTaiKhoan
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -21,11 +21,11 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="MaTaiKhoan" />
             <div class="form-group">
                 <label class="control-label">Tên người dùng</label>
-                <input asp-for="TenNguoiDung" class="form-control" />
-                <span asp-validation-for="TenNguoiDung" class="text-danger"></span>
+                <input asp-for="TenTaiKhoan" class="form-control" />
+                <span asp-validation-for="MatKhau" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label">Nhập mật khẩu mới</label>

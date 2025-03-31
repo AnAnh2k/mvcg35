@@ -72,7 +72,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         }
 
         [Route("Edit")]
-        [Authentication]
+       // [Authentication]
         [HttpGet]
         public IActionResult Edit(int id, string name)
         {

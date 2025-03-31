@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 
 namespace Web_CuaHangCafe.Models.Authentication
 {
@@ -7,14 +8,21 @@ namespace Web_CuaHangCafe.Models.Authentication
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.HttpContext.Session.GetString("TenNguoiDung") == null)
+            // Lấy thông tin đăng nhập và role từ session
+            string tenTaiKhoan = context.HttpContext.Session.GetString("TenTaiKhoan");
+            string role = context.HttpContext.Session.GetString("Role");
+
+            // Kiểm tra nếu chưa đăng nhập hoặc role không phải là Admin
+            if (string.IsNullOrEmpty(tenTaiKhoan) || role != "Admin")
             {
                 context.Result = new RedirectToRouteResult(new RouteValueDictionary
                 {
-                    {"controller", "access" },
-                    {"action", "login" }
+                    { "controller", "access1" },
+                    { "action", "login1" }
                 });
             }
+
+            base.OnActionExecuting(context);
         }
     }
 }

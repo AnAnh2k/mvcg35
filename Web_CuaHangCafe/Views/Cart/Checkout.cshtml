@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CartItem>
+﻿@model IEnumerable<Web_CuaHangCafe.Models.TbGioHang>
 
 @{
     ViewData["Title"] = "Thanh toán";
@@ -15,7 +15,7 @@
                         <i class="fa-solid fa-house"></i>
                         Trang chủ
                     </a>
-                    <a asp-controller="cart" asp-action="index"> Giỏ hàng</a>
+                    <a asp-controller="cart" asp-action="index">Giỏ hàng</a>
                     <span>Thanh toán</span>
                 </div>
             </div>
@@ -23,12 +23,13 @@
     </div>
 </div>
 <!-- Breadcrumb End -->
-
 <!-- Checkout Section Begin -->
 <section class="checkout spad">
     <div class="container">
-        <form asp-controller="cart" asp-action="confirmation" class="checkout__form">
+        <!-- Form xác nhận thanh toán: gửi dữ liệu qua POST đến action Confirmation -->
+        <form asp-controller="cart" asp-action="Confirmation" method="post" class="checkout__form">
             <div class="row">
+                <!-- Phần nhập thông tin khách hàng -->
                 <div class="col-lg-8">
                     <h5>Chi tiết hoá đơn</h5>
                     <div class="row">
@@ -50,6 +51,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Phần hiển thị đơn hàng của khách hàng -->
                 <div class="col-lg-4">
                     <div class="checkout__order">
                         <h5>Đơn hàng của bạn</h5>
@@ -59,10 +61,15 @@
                                     <span class="top__text">Sản phẩm</span>
                                     <span class="top__text__right">Thành tiền</span>
                                 </li>
-
                                 @foreach (var item in Model)
                                 {
-                                    <li class="item">@item.TenSp <span>@item.ThanhTien.Value.ToString("n0") &#8363;</span></li>
+                                    <li class="item">
+                                        @* Lấy tên sản phẩm qua thuộc tính điều hướng *@
+                                        @item.MaSanPhamNavigation.TenSanPham
+                                        <span>
+                                            @(item.SoLuong * item.MaSanPhamNavigation.GiaBan) &#8363;
+                                        </span>
+                                    </li>
                                 }
                             </ul>
                         </div>
@@ -74,17 +81,17 @@
                         <div class="checkout__order__widget">
                             <label for="visa">
                                 MasterCard/Visa
-                                <input type="radio" id="visa" name="checkoutMethod">
+                                <input type="radio" id="visa" name="checkoutMethod" value="visa" checked>
                                 <span class="checkmark"></span>
                             </label>
                             <label for="banking">
                                 Chuyển khoản ngân hàng
-                                <input type="radio" id="banking" name="checkoutMethod">
+                                <input type="radio" id="banking" name="checkoutMethod" value="banking">
                                 <span class="checkmark"></span>
                             </label>
                             <label for="wallet">
                                 Ví điện tử
-                                <input type="radio" id="wallet" name="checkoutMethod">
+                                <input type="radio" id="wallet" name="checkoutMethod" value="wallet">
                                 <span class="checkmark"></span>
                             </label>
                         </div>
@@ -98,17 +105,16 @@
 <!-- Checkout Section End -->
 
 <script>
-    // Lặp qua tất cả các phần tử có class "item" và thêm số thứ tự
-    var items = document.querySelectorAll('.item');
-    items.forEach(function (item, index) {
-        var numberP = document.createElement('p');
-        numberP.classList.add('number');
-        numberP.textContent = (index + 1) + '. ';
-
-        // Thêm quy tắc CSS cho phần tử mới tạo
-        numberP.style.display = 'inline'; // Hiển thị trên cùng một dòng
-        numberP.style.fontWeight = '500'; // Độ đậm
-
-        item.insertBefore(numberP, item.firstChild);
+    // Đảm bảo script chạy sau khi DOM đã đầy đủ (ở event DOMContentLoaded)
+    document.addEventListener("DOMContentLoaded", function () {
+        var items = document.querySelectorAll('.item');
+        items.forEach(function (item, index) {
+            var numberP = document.createElement('p');
+            numberP.classList.add('number');
+            numberP.textContent = (index + 1) + '. ';
+            numberP.style.display = 'inline';
+            numberP.style.fontWeight = '500';
+            item.insertBefore(numberP, item.firstChild);
+        });
     });
 </script>

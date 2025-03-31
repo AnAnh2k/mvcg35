@@ -16,8 +16,8 @@ public partial class TbGioHang
     [Key]
     public int MaSanPham { get; set; }
 
-    [Column(TypeName = "decimal(18, 2)")]
-    public decimal SoLuong { get; set; }
+
+    public int SoLuong { get; set; }
 
     [ForeignKey("MaKhachHang")]
     [InverseProperty("TbGioHangs")]

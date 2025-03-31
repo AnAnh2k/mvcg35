@@ -1,6 +1,6 @@
 ﻿@using Web_CuaHangCafe.Models
 @using X.PagedList.Mvc.Core;
-@model X.PagedList.IPagedList<TbQuanTriVien>
+@model X.PagedList.IPagedList<TbTaiKhoan>
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -38,14 +38,14 @@
                     {
                         <tr>
                             <td>
-                                @Html.DisplayFor(modelItem =>item.Id)
+                                @Html.DisplayFor(modelItem =>item.MaTaiKhoan)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.TenNguoiDung)
+                                @Html.DisplayFor(modelItem => item.TenTaiKhoan)
                             </td>
                             <td>
-                                <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.Id" asp-route-name="@item.TenNguoiDung">Thay đổi thông tin đăng nhập</a>
-                                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id">Xoá</a>
+                                <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.MaTaiKhoan" asp-route-name="@item.TenTaiKhoan">Thay đổi thông tin đăng nhập</a>
+                                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.MaTaiKhoan">Xoá</a>
                             </td>
                         </tr>
                     }

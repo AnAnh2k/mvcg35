@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Web_CuaHangCafe.Data;
 using Web_CuaHangCafe.Repository;
 
@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+// Đăng ký IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(connectionString));
 builder.Services.AddScoped<INhomSpRepository, NhomSpRepository>();

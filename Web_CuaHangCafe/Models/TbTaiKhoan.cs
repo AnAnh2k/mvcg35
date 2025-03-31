@@ -25,9 +25,9 @@ public partial class TbTaiKhoan
 
     [ForeignKey("MaNhanVien")]
     [InverseProperty("TbTaiKhoans")]
-    public virtual TbNhanVien MaNhanVienNavigation { get; set; } = null!;
+    public virtual TbNhanVien? MaNhanVienNavigation { get; set; }
 
     [ForeignKey("MaQuyen")]
     [InverseProperty("TbTaiKhoans")]
-    public virtual TbQuyen MaQuyenNavigation { get; set; } = null!;
+    public virtual TbQuyen? MaQuyenNavigation { get; set; } 
 }

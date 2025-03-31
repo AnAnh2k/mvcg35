@@ -82,3 +82,35 @@
 .pagination__margin {
     margin-right: 6px;
 }
+
+.user-menu {
+    position: relative;
+}
+
+     Ẩn dropdown mặc định 
+    .user-menu .dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 9999;
+    }
+
+     Khi dropdown được mở, hiển thị dưới dạng block 
+    .user-menu.show .dropdown-menu,
+    .user-menu:focus-within .dropdown-menu {
+        display: block !important;
+    }
+/*
+.user-menu {
+    position: relative;
+}
+
+    .user-menu .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        z-index: 9999;
+    }
+*/
+
