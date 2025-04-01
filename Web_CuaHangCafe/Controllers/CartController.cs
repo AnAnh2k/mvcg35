@@ -232,8 +232,6 @@ namespace Web_CuaHangCafe.Controllers
             }
         }
 
-
-        // Trang Checkout hiển thị các mục trong giỏ hàng
         public async Task<IActionResult> Checkout()
         {
             string maKhachHangStr = HttpContext.Session.GetString("MaKhachHang");
@@ -243,22 +241,35 @@ namespace Web_CuaHangCafe.Controllers
             }
             int maKhachHang = int.Parse(maKhachHangStr);
 
+            // Lấy các mục trong giỏ hàng
             var cartItems = await _context.TbGioHangs
                 .Include(g => g.MaSanPhamNavigation)
                 .Where(c => c.MaKhachHang == maKhachHang)
                 .ToListAsync();
+
             if (cartItems == null || !cartItems.Any())
             {
                 return RedirectToAction("Index", "Home");
             }
 
+            // Tính tổng tiền
             decimal tongTien = cartItems.Sum(item => item.SoLuong * item.MaSanPhamNavigation.GiaBan);
-            ViewData["total"] = tongTien.ToString("n0");
-            return View(cartItems);
+
+            // Lấy thông tin khách hàng dựa trên MaKhachHang được lưu trong session
+            var customer = await _context.TbKhachHangs.FindAsync(maKhachHang);
+
+            var model = new Web_CuaHangCafe.ViewModels.CheckoutViewModel
+            {
+                CartItems = cartItems,
+                Customer = customer,
+                Total = tongTien.ToString("n0")
+            };
+
+            return View(model);
         }
 
-        // Xử lý xác nhận thanh toán: tạo hóa đơn và chi tiết hóa đơn, sau đó xoá giỏ hàng
-        public async Task<IActionResult> Confirmation(string customerName, string phoneNumber, string address)
+
+        public async Task<IActionResult> Confirmation(string customerName, string phoneNumber, string address, string checkoutMethod)
         {
             string maKhachHangStr = HttpContext.Session.GetString("MaKhachHang");
             if (string.IsNullOrEmpty(maKhachHangStr))
@@ -276,23 +287,17 @@ namespace Web_CuaHangCafe.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Tìm khách hàng theo số điện thoại; nếu chưa có thì tạo mới.
-            var customer = await _context.TbKhachHangs.FirstOrDefaultAsync(x => x.SdtkhachHang == phoneNumber);
+            // Sử dụng biến maKhachHang được khai báo ở đây
+            var customer = await _context.TbKhachHangs.FindAsync(maKhachHang);
             if (customer == null)
             {
-                customer = new TbKhachHang
-                {
-                    TenKhachHang = customerName,
-                    SdtkhachHang = phoneNumber,
-                    DiaChi = address
-                };
-                _context.TbKhachHangs.Add(customer);
-                await _context.SaveChangesAsync();
+                // Xử lý khi không tìm thấy khách hàng hoặc tạo mới nếu cần
             }
             else
             {
+                // Nếu cần, cập nhật thông tin khách hàng
                 customer.TenKhachHang = customerName;
-                customer.DiaChi = address;
+                // Nếu bạn không cho phép chỉnh sửa, thì bạn có thể bỏ qua cập nhật số điện thoại hay địa chỉ
                 _context.TbKhachHangs.Update(customer);
                 await _context.SaveChangesAsync();
             }
@@ -301,11 +306,11 @@ namespace Web_CuaHangCafe.Controllers
             var order = new TbHoaDonBan
             {
                 MaHoaDon = Guid.NewGuid(),
-                MaQuan = 1, // Giá trị minh họa; thay đổi theo nghiệp vụ của bạn
+                MaQuan = 1,
                 NgayLap = DateTime.Now,
-                MaNhanVien = 1, // Giá trị mẫu; thay đổi nếu cần
+                MaNhanVien = 1,
                 MaKhachHang = customer.MaKhachHang,
-                HinhThucThanhToan = "Tiền mặt",
+                HinhThucThanhToan = checkoutMethod,
                 TongTien = cartItems.Sum(x => x.SoLuong * x.MaSanPhamNavigation.GiaBan),
                 TrangThai = "Hoàn thành",
                 TrangThaiThanhToan = true
@@ -320,20 +325,21 @@ namespace Web_CuaHangCafe.Controllers
                 {
                     MaHoaDon = order.MaHoaDon,
                     MaSanPham = cartItem.MaSanPham,
-                    DonGia  = cartItem.MaSanPhamNavigation.GiaBan,
+                    DonGia = cartItem.MaSanPhamNavigation.GiaBan,
                     SoLuong = cartItem.SoLuong,
                 };
                 _context.TbChiTietHoaDonBans.Add(orderDetail);
-                await _context.SaveChangesAsync();
             }
+            await _context.SaveChangesAsync();
 
-            // Xoá các mục giỏ hàng của khách hàng sau khi tạo hóa đơn
+            // Xoá các mặt hàng giỏ hàng của khách hàng sau khi tạo hóa đơn
             var cartRecords = _context.TbGioHangs.Where(c => c.MaKhachHang == maKhachHang);
             _context.TbGioHangs.RemoveRange(cartRecords);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Success");
         }
+
 
         public IActionResult Success()
         {

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Web_CuaHangCafe.Models.TbGioHang>
+﻿@model Web_CuaHangCafe.ViewModels.CheckoutViewModel
 
 @{
     ViewData["Title"] = "Thanh toán";
@@ -36,17 +36,17 @@
                         <div class="col-lg-12">
                             <div class="checkout__form__input">
                                 <p>Họ và tên <span>*</span></p>
-                                <input type="text" name="customerName" placeholder="Nhập họ và tên" required>
+                                <input type="text" name="customerName" value="@Model.Customer.TenKhachHang" placeholder="Họ và tên" readonly required>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="checkout__form__input">
                                 <p>Số điện thoại <span>*</span></p>
-                                <input type="tel" pattern="[0-9]{10}" name="phoneNumber" placeholder="Nhập số điện thoại" required>
+                                <input type="tel" pattern="[0-9]{10}" name="phoneNumber" value="@Model.Customer.SdtkhachHang" placeholder="Số điện thoại" readonly required>
                             </div>
                             <div class="checkout__form__input">
                                 <p>Địa chỉ <span>*</span></p>
-                                <input type="text" name="address" placeholder="Nhập địa chỉ" required>
+                                <input type="text" name="address" value="@Model.Customer.DiaChi" placeholder="Địa chỉ" readonly required>
                             </div>
                         </div>
                     </div>
@@ -61,10 +61,9 @@
                                     <span class="top__text">Sản phẩm</span>
                                     <span class="top__text__right">Thành tiền</span>
                                 </li>
-                                @foreach (var item in Model)
+                                @foreach (var item in Model.CartItems)
                                 {
                                     <li class="item">
-                                        @* Lấy tên sản phẩm qua thuộc tính điều hướng *@
                                         @item.MaSanPhamNavigation.TenSanPham
                                         <span>
                                             @(item.SoLuong * item.MaSanPhamNavigation.GiaBan) &#8363;
@@ -75,26 +74,29 @@
                         </div>
                         <div class="checkout__order__total">
                             <ul>
-                                <li>Tổng tiền <span>@ViewData["total"] &#8363;</span></li>
+                                <li>Tổng tiền <span>@Model.Total &#8363;</span></li>
                             </ul>
-                        </div>
-                        <div class="checkout__order__widget">
-                            <label for="visa">
-                                MasterCard/Visa
-                                <input type="radio" id="visa" name="checkoutMethod" value="visa" checked>
-                                <span class="checkmark"></span>
-                            </label>
-                            <label for="banking">
-                                Chuyển khoản ngân hàng
-                                <input type="radio" id="banking" name="checkoutMethod" value="banking">
-                                <span class="checkmark"></span>
-                            </label>
-                            <label for="wallet">
-                                Ví điện tử
-                                <input type="radio" id="wallet" name="checkoutMethod" value="wallet">
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
+                            <div class="checkout__order__widget">
+                                <label for="qr">
+                                    QR
+                                    <input type="radio" id="qr" name="checkoutMethod" value="QR" checked>
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label for="chuyenkhoan">
+                                    Chuyển khoản
+                                    <!-- Lưu ý: giá trị phải khớp với CHECK constraint. Nếu trong CSDL là "Chuy?n kho?n", hãy dùng nguyên chuỗi đó -->
+                                    <input type="radio" id="chuyenkhoan" name="checkoutMethod" value="Chuy?n kho?n">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label for="tienmat">
+                                    Tiền mặt
+                                    <!-- Tương tự, nếu CSDL ghi "Ti?n m?t", sử dụng chính xác chuỗi đó -->
+                                    <input type="radio" id="tienmat" name="checkoutMethod" value="Ti?n m?t">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+
+
                         <button type="submit" class="site-btn">Đặt hàng</button>
                     </div>
                 </div>
