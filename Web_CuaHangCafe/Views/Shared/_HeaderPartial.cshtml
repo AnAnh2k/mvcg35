@@ -68,6 +68,12 @@
                                             Admin
                                         </a>
                                     }
+                                    @if (role == "User")
+                                    {
+                                        <a class="dropdown-item" asp-controller="HoaDon" asp-action="Index">
+                                            Hóa đơn đơn hàng
+                                        </a>
+                                    }
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" asp-controller="Access1" asp-action="Logout">
                                         Đăng xuất

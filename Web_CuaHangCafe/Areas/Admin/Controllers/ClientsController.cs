@@ -102,20 +102,36 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         {
             TempData["Message"] = "";
 
-            var hoaDon = _context.TbHoaDonBans.Where(x => x.MaHoaDon == Guid.Parse(id)).ToList();
-
-            if (hoaDon.Count() > 0)
+            // Kiểm tra định dạng int hợp lệ cho khóa khách hàng
+            if (!int.TryParse(id, out int customerId))
             {
-                TempData["Message"] = "Xoá không thành công";
+                TempData["Message"] = "Sai định dạng mã khách hàng.";
                 return RedirectToAction("Index", "Clients");
             }
 
-            _context.Remove(_context.TbKhachHangs.Find(id));
+            // Kiểm tra xem khách hàng có hóa đơn liên quan không
+            var hoaDon = _context.TbHoaDonBans.Where(x => x.MaKhachHang == customerId).ToList();
+            if (hoaDon.Any())
+            {
+                TempData["Message"] = "Không xoá được do khách hàng có hóa đơn liên quan.";
+                return RedirectToAction("Index", "Clients");
+            }
+
+            // Tìm khách hàng
+            var khachHang = _context.TbKhachHangs.Find(customerId);
+            if (khachHang == null)
+            {
+                TempData["Message"] = "Không tìm thấy khách hàng cần xóa.";
+                return RedirectToAction("Index", "Clients");
+            }
+
+            _context.TbKhachHangs.Remove(khachHang);
             _context.SaveChanges();
 
-            TempData["Message"] = "Xoá thành công";
-
+            TempData["Message"] = "Xoá khách hàng thành công.";
             return RedirectToAction("Index", "Clients");
         }
+
+
     }
 }

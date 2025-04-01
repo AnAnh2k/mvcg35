@@ -1,74 +1,84 @@
 ﻿@using Web_CuaHangCafe.Models
-@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Core
 @model X.PagedList.IPagedList<TbChiTietHoaDonBan>
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết hoá đơn";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<div class="container" style="margin-bottom:20px;">
+<div class="container my-3">
     <div class="row">
-        <div class="col-lg-8 col-md-12 col-sm-12">
-            <div class="page-header">
-                <h3 class="page-title">Chi tiết hoá đơn bán: <span style="color:#666;text-transform:capitalize;">@ViewBag.name</span></h3>
-            </div>
+        <div class="col-md-12">
+            @if (Model.Any())
+            {
+                // Lấy chi tiết đầu tiên của hóa đơn để truy xuất thông tin header từ đối tượng hóa đơn
+                var invoiceDetail = Model.First();
+                if (invoiceDetail.MaHoaDonNavigation == null)
+                {
+                    <p>Không có thông tin hóa đơn để hiển thị.</p>
+                }
+                else
+                {
+                    var bill = invoiceDetail.MaHoaDonNavigation;
+                    <div class="invoice-summary mb-4">
+                        <h3>Chi tiết hoá đơn: <span class="text-secondary">@bill.MaHoaDon</span></h3>
+                        <p>
+                            <strong>Ngày bán:</strong> @(bill.NgayLap.ToString("dd/MM/yyyy"))
+                        </p>
+                        <p>
+                            <strong>Tổng tiền:</strong> @(bill.TongTien.ToString("n0")) &#8363;
+                        </p>
+                        <p>
+                            <strong>Hình thức thanh toán:</strong> @bill.HinhThucThanhToan
+                        </p>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>Không có chi tiết hóa đơn để hiển thị.</p>
+            }
         </div>
     </div>
 </div>
 
 <div class="container">
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Mã hoá đơn</th>
+                    <th>Sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
                     <tr>
-                        <th>Mã hoá đơn</th>
-                        <th>Mã sản phẩm</th>
-                        <th>Giá bán</th>
-                        <th>Giảm giá</th>
-                        <th>Số lượng</th>
-                        <th>Thành tiền</th>
+                        <td>@item.MaHoaDon</td>
+                        <td>@(item.MaSanPhamNavigation?.TenSanPham ?? "N/A")</td>
+                        <td>@(item.DonGia.ToString("n0") ?? "0") &#8363;</td>
+                        <td>@item.SoLuong</td>
+                        <td>@(item.ThanhTien?.ToString("n0") ?? "0") &#8363;</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.MaHoaDon)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.MaSanPham)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.DonGia)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.DonGia)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.SoLuong)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.ThanhTien) &#8363;
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
 
-    @Html.PagedListPager(Model, page=>Url.Action("Details", new {page = page}), new PagedListRenderOptions()
-    {
-        MaximumPageNumbersToDisplay = 5,
-        LiElementClasses = new List<String> {"page-item"},
-        PageClasses = new List<String> {"page-link"}
-    })
+    @Html.PagedListPager(Model, page => Url.Action("Details", new { page }), new PagedListRenderOptions()
+{
+    MaximumPageNumbersToDisplay = 5,
+    LiElementClasses = new List<string> { "page-item" },
+    PageClasses = new List<string> { "page-link" }
+})
 </div>
 
-<div>
-    <a asp-action="Index">Quay về</a>
+<div class="my-3">
+    <a asp-action="Index" class="btn btn-secondary">Quay về danh sách hoá đơn</a>
 </div>

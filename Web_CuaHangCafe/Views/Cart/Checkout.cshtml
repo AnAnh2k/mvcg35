@@ -66,7 +66,7 @@
                                     <li class="item">
                                         @item.MaSanPhamNavigation.TenSanPham
                                         <span>
-                                            @(item.SoLuong * item.MaSanPhamNavigation.GiaBan) &#8363;
+                                            @((item.SoLuong * item.MaSanPhamNavigation.GiaBan).ToString("n0")) &#8363;
                                         </span>
                                     </li>
                                 }
@@ -85,13 +85,13 @@
                                 <label for="chuyenkhoan">
                                     Chuyển khoản
                                     <!-- Lưu ý: giá trị phải khớp với CHECK constraint. Nếu trong CSDL là "Chuy?n kho?n", hãy dùng nguyên chuỗi đó -->
-                                    <input type="radio" id="chuyenkhoan" name="checkoutMethod" value="Chuy?n kho?n">
+                                    <input type="radio" id="chuyenkhoan" name="checkoutMethod" value="Chuyển khoản">
                                     <span class="checkmark"></span>
                                 </label>
                                 <label for="tienmat">
                                     Tiền mặt
                                     <!-- Tương tự, nếu CSDL ghi "Ti?n m?t", sử dụng chính xác chuỗi đó -->
-                                    <input type="radio" id="tienmat" name="checkoutMethod" value="Ti?n m?t">
+                                    <input type="radio" id="tienmat" name="checkoutMethod" value="Tiền mặt">
                                     <span class="checkmark"></span>
                                 </label>
                             </div>

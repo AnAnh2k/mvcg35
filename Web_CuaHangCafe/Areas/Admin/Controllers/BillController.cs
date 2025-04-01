@@ -25,11 +25,16 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         {
             int pageSize = 30;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var listItem = _context.TbHoaDonBans.AsNoTracking().OrderByDescending(x => x.NgayLap).ToList();
+            var listItem = _context.TbHoaDonBans
+                                   .Include(x => x.MaKhachHangNavigation) // Load thông tin khách hàng
+                                   .AsNoTracking()
+                                   .OrderByDescending(x => x.NgayLap)
+                                   .ToList();
             PagedList<TbHoaDonBan> pagedListItem = new PagedList<TbHoaDonBan>(listItem, pageNumber, pageSize);
 
             return View(pagedListItem);
         }
+
 
         [Route("Search")]
         [Authentication]
@@ -41,9 +46,27 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 
             ViewBag.search = search;
 
-            var listItem = _context.TbHoaDonBans.AsNoTracking().Where(x => x.NgayLap.ToString().Contains(search)).OrderBy(x => x.MaHoaDon).ToList();
-            PagedList<TbHoaDonBan> pagedListItem = new PagedList<TbHoaDonBan>(listItem, pageNumber, pageSize);
+            // Nếu giá trị search không rỗng và có thể chuyển sang DateTime
+            List<TbHoaDonBan> listItem;
+            if (!string.IsNullOrEmpty(search) && DateTime.TryParse(search, out DateTime searchDate))
+            {
+                // So sánh ngày bán (chỉ lấy phần Date) với ngày tìm kiếm
+                listItem = _context.TbHoaDonBans
+                    .AsNoTracking()
+                    .Where(x => x.NgayLap.Date == searchDate.Date)
+                    .OrderBy(x => x.MaHoaDon)
+                    .ToList();
+            }
+            else
+            {
+                // Nếu không có giá trị tìm kiếm hoặc search không hợp lệ, trả về danh sách tất cả
+                listItem = _context.TbHoaDonBans
+                    .AsNoTracking()
+                    .OrderBy(x => x.MaHoaDon)
+                    .ToList();
+            }
 
+            PagedList<TbHoaDonBan> pagedListItem = new PagedList<TbHoaDonBan>(listItem, pageNumber, pageSize);
             return View(pagedListItem);
         }
 
@@ -52,14 +75,42 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Details(int? page, string id, string name)
         {
-            int pageSize = 30;
-            int pageNumber = page == null || page < 0 ? 1 : page.Value;
-            var listItem = _context.TbChiTietHoaDonBans.AsNoTracking().Where(x => x.MaHoaDon == Guid.Parse(id)).OrderBy(x => x.MaHoaDon).ToList();
-            PagedList<TbChiTietHoaDonBan> pagedListItem = new PagedList<TbChiTietHoaDonBan>(listItem, pageNumber, pageSize);
+            if (string.IsNullOrEmpty(id))
+            {
+                TempData["Message"] = "Mã hóa đơn không hợp lệ.";
+                return RedirectToAction("Index");
+            }
+            if (!Guid.TryParse(id, out Guid billGuid))
+            {
+                TempData["Message"] = "Sai định dạng mã hóa đơn.";
+                return RedirectToAction("Index");
+            }
 
-            ViewBag.name = name;
+            int pageSize = 30;
+            int pageNumber = (page == null || page < 0) ? 1 : page.Value;
+
+            // Đảm bảo Include navigation property của hóa đơn và sản phẩm
+            var listItem = _context.TbChiTietHoaDonBans
+                .Include(ct => ct.MaHoaDonNavigation)
+                .Include(ct => ct.MaSanPhamNavigation)
+                .AsNoTracking()
+                .Where(x => x.MaHoaDon == billGuid)
+                .OrderBy(x => x.MaHoaDon)
+                .ToList();
+
+            if (!listItem.Any())
+            {
+                TempData["Message"] = "Không tìm thấy chi tiết của hóa đơn.";
+                return RedirectToAction("Index");
+            }
+
+            var pagedListItem = new X.PagedList.PagedList<TbChiTietHoaDonBan>(listItem, pageNumber, pageSize);
+
+            ViewBag.Name = name;
 
             return View(pagedListItem);
         }
+
+
     }
 }

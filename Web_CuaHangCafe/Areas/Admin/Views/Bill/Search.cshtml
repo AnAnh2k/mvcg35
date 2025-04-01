@@ -20,10 +20,13 @@
                 @using (Html.BeginForm("Search", "Bill", FormMethod.Get))
                 {
                     <div class="input-group">
-                        <input type="date" class="form-control" name="search" style="border:none" autocomplete="off">
-                        <button class="btn" type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+                        <input type="date" class="form-control" name="search" style="border:none" autocomplete="off" placeholder="Tìm kiếm" />
+                        <button class="btn" type="submit">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
                     </div>
                 }
+
             </div>
         </div>
     </div>
