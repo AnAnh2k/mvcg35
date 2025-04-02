@@ -97,7 +97,7 @@
                             <th>Mã hóa đơn</th>
                             <th>Ngày lập</th>
                             <th>Tổng tiền</th>
-                            <th>Trạng thái thanh toán</th>
+                            <th>Trạng thái</th>
                             <th>Chi tiết</th>
                         </tr>
                     </thead>
@@ -108,7 +108,7 @@
                                 <td>@invoice.MaHoaDon</td>
                                 <td>@invoice.NgayLap.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>@invoice.TongTien.ToString("N2")</td>
-                                <td>@(invoice.TrangThaiThanhToan ? "Đã thanh toán" : "Chưa thanh toán")</td>
+                                <td>@(invoice.TrangThai)</td>
                                 <td>
                                     @if (invoice.TbChiTietHoaDonBans != null && invoice.TbChiTietHoaDonBans.Any())
                                     {

@@ -313,7 +313,7 @@ namespace Web_CuaHangCafe.Controllers
                 HinhThucThanhToan = checkoutMethod,
                 TongTien = cartItems.Sum(x => x.SoLuong * x.MaSanPhamNavigation.GiaBan),
                 TrangThai = "Hoàn thành",
-                TrangThaiThanhToan = true
+             
             };
             _context.TbHoaDonBans.Add(order);
             await _context.SaveChangesAsync();

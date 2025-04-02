@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------
+﻿/*-------------------------------------------------------------------
   ===== Table of Contents =====
 
   * Bootstrap functions
@@ -20845,5 +20845,10 @@ dl {
     -ms-flex-positive: 1;
     flex-grow: 1;
 }
+
+.sidebar-offcanvas.active {
+    transform: translateX(0); /* Hoặc logic hiển thị */
+}
+
 
 /*# sourceMappingURL=style.css.map */

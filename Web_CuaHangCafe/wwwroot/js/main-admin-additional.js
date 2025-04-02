@@ -5,4 +5,5 @@
     } else {
         x.className = "sidebar sidebar-offcanvas";
     }
+
 }

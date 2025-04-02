@@ -30,7 +30,6 @@ public partial class TbHoaDonBan
     [StringLength(50)]
     public string TrangThai { get; set; } = null!;
 
-    public bool TrangThaiThanhToan { get; set; }
 
     [ForeignKey("MaKhachHang")]
     [InverseProperty("TbHoaDonBans")]
