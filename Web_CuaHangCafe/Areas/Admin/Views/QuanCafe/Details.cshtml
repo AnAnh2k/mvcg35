@@ -1,4 +1,5 @@
 ﻿@model Web_CuaHangCafe.Models.TbQuanCafe
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Chi tiết Quán Café";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
@@ -37,3 +38,4 @@
     <a asp-action="Edit" asp-route-id="@Model.MaQuan" class="btn btn-primary">Sửa</a>
     <a asp-action="Index" class="btn btn-secondary">Quay về danh sách</a>
 </div>
+

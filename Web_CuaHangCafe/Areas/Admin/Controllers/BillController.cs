@@ -26,7 +26,8 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             int pageSize = 30;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var listItem = _context.TbHoaDonBans
-                                   .Include(x => x.MaKhachHangNavigation) // Load thông tin khách hàng
+                                   .Include(x => x.MaKhachHangNavigation)
+                                        .Include(x => x.MaQuanNavigation)// Load thông tin khách hàng
                                    .AsNoTracking()
                                    .OrderByDescending(x => x.NgayLap)
                                    .ToList();

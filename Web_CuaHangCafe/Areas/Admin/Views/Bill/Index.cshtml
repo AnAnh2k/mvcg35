@@ -35,6 +35,7 @@
                     <th>Mã hoá đơn</th>
                     <th>Ngày bán</th>
                     <th>Tên khách hàng</th>
+                    <th>Tên quán</th>
                     <th>SĐT khách hàng</th>
                     <th>Hình thức TT</th>
                     <th>Tổng tiền</th>
@@ -48,6 +49,7 @@
                         <td>@item.MaHoaDon</td>
                         <td>@item.NgayLap.ToString("dd/MM/yyyy")</td>
                         <td>@(item.MaKhachHangNavigation?.TenKhachHang ?? "N/A")</td>
+                        <td>@(item.MaQuanNavigation?.TenQuan ?? "N/A")</td>
                         <td>@(item.MaKhachHangNavigation?.SdtkhachHang ?? "N/A")</td>
                         <td>@item.HinhThucThanhToan</td>
                         <td>@item.TongTien.ToString("n0") &#8363;</td>
