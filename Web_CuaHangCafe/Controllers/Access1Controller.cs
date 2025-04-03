@@ -123,6 +123,8 @@ namespace Web_CuaHangCafe.Controllers
                 // Gán thông tin phiên (Session) cho Admin
                 HttpContext.Session.SetString("TenTaiKhoan", tkAdmin.TenTaiKhoan);
                 HttpContext.Session.SetString("Role", "Admin");
+                // Lưu MaNhanVien (nếu không null)
+                HttpContext.Session.SetString("MaNhanVien", tkAdmin.MaNhanVien.ToString());
                 return RedirectToAction("Index", "Home");
             }
 

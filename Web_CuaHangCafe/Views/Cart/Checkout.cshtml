@@ -29,10 +29,11 @@
         <!-- Form xác nhận thanh toán: gửi dữ liệu qua POST đến action Confirmation -->
         <form asp-controller="cart" asp-action="Confirmation" method="post" class="checkout__form">
             <div class="row">
-                <!-- Phần nhập thông tin khách hàng -->
+                <!-- Phần nhập thông tin khách hàng và chọn quán -->
                 <div class="col-lg-8">
                     <h5>Chi tiết hoá đơn</h5>
                     <div class="row">
+                        <!-- Thông tin khách hàng đã có -->
                         <div class="col-lg-12">
                             <div class="checkout__form__input">
                                 <p>Họ và tên <span>*</span></p>
@@ -47,6 +48,16 @@
                             <div class="checkout__form__input">
                                 <p>Địa chỉ <span>*</span></p>
                                 <input type="text" name="address" value="@Model.Customer.DiaChi" placeholder="Địa chỉ" readonly required>
+                            </div>
+                        </div>
+                        <!-- Phần chọn tên quán -->
+                        <div class="col-lg-12">
+                            <div class="checkout__form__input">
+                                <p>Tên quán <span>*</span></p>
+                                <select name="MaQuan" class="form-control" asp-items="ViewBag.Quan" required>
+                                    <option value="">-- Chọn quán --</option>
+                                    @* Các option sẽ được tạo từ ViewBag.Quan *@
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -84,20 +95,19 @@
                                 </label>
                                 <label for="chuyenkhoan">
                                     Chuyển khoản
-                                    <!-- Lưu ý: giá trị phải khớp với CHECK constraint. Nếu trong CSDL là "Chuy?n kho?n", hãy dùng nguyên chuỗi đó -->
+                                    <!-- Lưu ý: trường hợp CSDL ghi là "Chuyển khoản", bạn giữ nguyên giá trị này -->
                                     <input type="radio" id="chuyenkhoan" name="checkoutMethod" value="Chuyển khoản">
                                     <span class="checkmark"></span>
                                 </label>
                                 <label for="tienmat">
                                     Tiền mặt
-                                    <!-- Tương tự, nếu CSDL ghi "Ti?n m?t", sử dụng chính xác chuỗi đó -->
                                     <input type="radio" id="tienmat" name="checkoutMethod" value="Tiền mặt">
                                     <span class="checkmark"></span>
                                 </label>
                             </div>
 
-
-                        <button type="submit" class="site-btn">Đặt hàng</button>
+                            <button type="submit" class="site-btn">Đặt hàng</button>
+                        </div>
                     </div>
                 </div>
             </div>

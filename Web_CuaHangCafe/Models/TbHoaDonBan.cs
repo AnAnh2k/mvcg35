@@ -17,9 +17,9 @@ public partial class TbHoaDonBan
     [Column(TypeName = "datetime")]
     public DateTime NgayLap { get; set; }
 
-    public int MaNhanVien { get; set; }
+    public int? MaNhanVien { get; set; }
 
-    public int? MaKhachHang { get; set; }
+    public int MaKhachHang { get; set; }
 
     [StringLength(50)]
     public string HinhThucThanhToan { get; set; } = null!;

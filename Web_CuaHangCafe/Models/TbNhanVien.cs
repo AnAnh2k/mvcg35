@@ -52,7 +52,7 @@ public partial class TbNhanVien
 
     [ForeignKey("MaQuan")]
     [InverseProperty("TbNhanViens")]
-    public virtual TbQuanCafe MaQuanNavigation { get; set; } = null!;
+    public virtual TbQuanCafe? MaQuanNavigation { get; set; }
 
     [InverseProperty("MaNhanVienNavigation")]
     public virtual ICollection<TbHoaDonBan> TbHoaDonBans { get; set; } = new List<TbHoaDonBan>();

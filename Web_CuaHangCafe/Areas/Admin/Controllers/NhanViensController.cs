@@ -1,11 +1,18 @@
 ﻿using System;
+
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web_CuaHangCafe.Data;
 using Web_CuaHangCafe.Models;
+
 using Web_CuaHangCafe.Models.Authentication;
 using X.PagedList;
+using Web_CuaHangCafe.Areas.Admin.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text;
+using System.Security.Cryptography;
+
 
 namespace Web_CuaHangCafe.Areas.Admin.Controllers
 {
@@ -20,6 +27,8 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             _context = context;
         }
 
+        
+
         // Danh sách nhân viên với phân trang
         [Route("")]
         [Route("Index")]
@@ -29,6 +38,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             int pageSize = 30;
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var listEmployee = _context.TbNhanViens.AsNoTracking()
+                                   .Include(q => q.MaQuanNavigation)
                                   .OrderBy(x => x.HoTen)
                                   .ToList();
             PagedList<TbNhanVien> pagedList = new PagedList<TbNhanVien>(listEmployee, pageNumber, pageSize);
@@ -67,7 +77,9 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         {
             var employee = _context.TbNhanViens
                                 .Include(x => x.TbTaiKhoans)
+                                  .Include(x => x.MaQuanNavigation)
                                 .Include(x => x.TbPhieuNhapHangs)
+                                
                                     .ThenInclude(ph => ph.TbPhieuNhapChiTiets)
                                 .FirstOrDefault(x => x.MaNhanVien == id);
 
@@ -79,30 +91,79 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             return View(employee);
         }
 
-        // Tạo nhân viên mới (nếu cần: ngoài chức năng đăng ký tự động cho nhân viên)
+     
+
+        // GET: Admin/NhanViens/Create
         [Route("Create")]
         [Authentication]
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var model = new EmployeeAccountViewModel();
+            // Các dropdown cho nhân viên
+            // (Nếu cần dropdown cho MaQuan, bạn cũng đã có)
+            ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+            ViewData["MaNhanVien"] = new SelectList(_context.TbNhanViens, "MaNhanVien", "HoTen");
+            ViewData["MaNhaCungCap"] = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
+            ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+
+
+            // Đối với tài khoản: truyền danh sách quyền
+            ViewBag.MaQuyen = new SelectList(_context.TbQuyens, "MaQuyen", "TenQuyen");
+
+            // Nếu cần truyền dropdown cho giới tính, có thể thiết lập từ view luôn.
+            return View(model);
         }
 
+        // Hàm băm mật khẩu dùng SHA-256
+        public static string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                byte[] hashBytes = sha256.ComputeHash(passwordBytes);
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in hashBytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        // POST: Admin/NhanViens/Create
         [Route("Create")]
         [Authentication]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(TbNhanVien nhanVien)
+        public async Task<IActionResult> Create(EmployeeAccountViewModel vm)
         {
             if (ModelState.IsValid)
             {
-                _context.TbNhanViens.Add(nhanVien);
-                _context.SaveChanges();
-                TempData["Message"] = "Thêm nhân viên thành công.";
-                return RedirectToAction("Index", "NhanViens");
+                // Băm mật khẩu của tài khoản (trường MatKhau ở Account)
+                string hashPassword = HashPassword(vm.Account.MatKhau);
+                vm.Account.MatKhau = hashPassword;
+
+                // Thêm thông tin nhân viên vào cơ sở dữ liệu
+                _context.TbNhanViens.Add(vm.Employee);
+                await _context.SaveChangesAsync();
+
+                // Sau khi tạo nhân viên, gán MaNhanVien (được tạo tự động) cho tài khoản
+                vm.Account.MaNhanVien = vm.Employee.MaNhanVien;
+
+                // (Tùy chọn) Bạn có thể gán mặc định quyền cho nhân viên nếu cần, ví dụ:
+                // vm.Account.MaQuyen = 2;
+
+                // Thêm thông tin tài khoản vào cơ sở dữ liệu
+                _context.TbTaiKhoans.Add(vm.Account);
+                int kq = await _context.SaveChangesAsync();
+
+                TempData["Message"] = kq > 0 ? "Thêm nhân viên thành công" : "Không thêm được nhân viên";
+                return RedirectToAction("Index");
             }
-            return View(nhanVien);
+            return View(vm);
         }
+
 
         // Chỉnh sửa thông tin nhân viên
         [Route("Edit")]
@@ -170,14 +231,26 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         {
             var employee = _context.TbNhanViens
                               .Include(x => x.TbTaiKhoans)
+                               .Include(x => x.TbHoaDonBans)
+                                                              .ThenInclude(ph => ph.TbChiTietHoaDonBans)
                               .Include(x => x.TbPhieuNhapHangs)
-                                  .ThenInclude(ph => ph.TbPhieuNhapChiTiets)
+                                                              .ThenInclude(ph => ph.TbPhieuNhapChiTiets)
                               .FirstOrDefault(x => x.MaNhanVien == id);
 
             if (employee == null)
             {
                 TempData["Message"] = "Không tìm thấy nhân viên cần xóa.";
                 return RedirectToAction("Index", "NhanViens");
+            }
+
+            // Xoá phiếu nhập hàng và chi tiết
+            foreach (var hoaDonBan in employee.TbHoaDonBans.ToList())
+            {
+                foreach (var ct in hoaDonBan.TbChiTietHoaDonBans.ToList())
+                {
+                    _context.TbChiTietHoaDonBans.Remove(ct);
+                }
+                _context.TbHoaDonBans.Remove(hoaDonBan);
             }
 
             // Xoá tài khoản
@@ -195,6 +268,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
                 }
                 _context.TbPhieuNhapHangs.Remove(phieuNhap);
             }
+        
 
             // Cuối cùng xoá nhân viên
             _context.TbNhanViens.Remove(employee);

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Web_CuaHangCafe.Controllers
 {
@@ -234,6 +235,8 @@ namespace Web_CuaHangCafe.Controllers
 
         public async Task<IActionResult> Checkout()
         {
+            ViewBag.Quan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+
             string maKhachHangStr = HttpContext.Session.GetString("MaKhachHang");
             if (string.IsNullOrEmpty(maKhachHangStr))
             {
@@ -244,6 +247,7 @@ namespace Web_CuaHangCafe.Controllers
             // Lấy các mục trong giỏ hàng
             var cartItems = await _context.TbGioHangs
                 .Include(g => g.MaSanPhamNavigation)
+                
                 .Where(c => c.MaKhachHang == maKhachHang)
                 .ToListAsync();
 
@@ -269,7 +273,7 @@ namespace Web_CuaHangCafe.Controllers
         }
 
 
-        public async Task<IActionResult> Confirmation(string customerName, string phoneNumber, string address, string checkoutMethod)
+        public async Task<IActionResult> Confirmation(string customerName, string phoneNumber, string address, string checkoutMethod,int MaQuan)
         {
             string maKhachHangStr = HttpContext.Session.GetString("MaKhachHang");
             if (string.IsNullOrEmpty(maKhachHangStr))
@@ -306,13 +310,13 @@ namespace Web_CuaHangCafe.Controllers
             var order = new TbHoaDonBan
             {
                 MaHoaDon = Guid.NewGuid(),
-                MaQuan = 1,
+                MaQuan = MaQuan,
                 NgayLap = DateTime.Now,
-                MaNhanVien = 1,
+                MaNhanVien = null,
                 MaKhachHang = customer.MaKhachHang,
                 HinhThucThanhToan = checkoutMethod,
                 TongTien = cartItems.Sum(x => x.SoLuong * x.MaSanPhamNavigation.GiaBan),
-                TrangThai = "Hoàn thành",
+                TrangThai = "Chưa hoàn thành",
              
             };
             _context.TbHoaDonBans.Add(order);

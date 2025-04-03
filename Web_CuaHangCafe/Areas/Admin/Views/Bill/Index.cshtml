@@ -35,9 +35,9 @@
                     <th>Mã hoá đơn</th>
                     <th>Ngày bán</th>
                     <th>Tên khách hàng</th>
+                    <th>Tên nhân viên</th>
                     <th>Tên quán</th>
                     <th>SĐT khách hàng</th>
-                    <th>Hình thức TT</th>
                     <th>Hình thức TT</th>
                     <th>Trạng thái</th>
                     <th>Tổng tiền</th>
@@ -51,17 +51,19 @@
                         <td>@item.MaHoaDon</td>
                         <td>@item.NgayLap.ToString("dd/MM/yyyy")</td>
                         <td>@(item.MaKhachHangNavigation?.TenKhachHang ?? "N/A")</td>
+                        <td>@(item.MaNhanVienNavigation?.HoTen ?? "N/A")</td>
                         <td>@(item.MaQuanNavigation?.TenQuan ?? "N/A")</td>
                         <td>@(item.MaKhachHangNavigation?.SdtkhachHang ?? "N/A")</td>
                         <td>@item.HinhThucThanhToan</td>
                         <td>@item.TrangThai</td>
                         <td>@item.TongTien.ToString("n0") &#8363;</td>
                         <td>
-                            <a class="btn btn-info btn-sm"
-                               asp-action="Details"
-                               asp-route-id="@item.MaHoaDon">
-                                Xem chi tiết
-                            </a>
+                            <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.MaHoaDon">Xem chi tiết</a>
+                            @if (item.TrangThai == "Chưa hoàn thành")
+                            {
+                                <!-- Nút "Xác nhận" hiện khi trạng thái là "Chưa hoàn thành" -->
+                                <a class="btn btn-success btn-sm ml-2" asp-action="Confirm" asp-route-id="@item.MaHoaDon">Xác nhận</a>
+                            }
                         </td>
                     </tr>
                 }

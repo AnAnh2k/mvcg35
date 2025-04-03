@@ -5,6 +5,7 @@ using Web_CuaHangCafe.Models;
 using Web_CuaHangCafe.ViewModels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Web_CuaHangCafe.Controllers
 {
@@ -62,7 +63,7 @@ namespace Web_CuaHangCafe.Controllers
             // Tương tự như action ThongTin => load dữ liệu hiện tại vào AccountInfoViewModel
             string tenTaiKhoan = HttpContext.Session.GetString("TenTaiKhoan") ?? "";
             string role = HttpContext.Session.GetString("Role") ?? "";
-
+            ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
             if (string.IsNullOrEmpty(tenTaiKhoan) || string.IsNullOrEmpty(role))
                 return RedirectToAction("Login1", "Access1");
 

@@ -18,6 +18,47 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             _context = context;
         }
 
+        // Action Confirm để cập nhật trạng thái hóa đơn
+        [HttpGet]
+        [Route("Confirm/{id}")]
+        [Authentication]
+        public async Task<IActionResult> Confirm(Guid id)
+        {
+            // Lấy mã nhân viên đang đăng nhập từ Session hoặc từ User Claims
+            string maNhanVienStr = HttpContext.Session.GetString("MaNhanVien");
+            if (string.IsNullOrEmpty(maNhanVienStr))
+            {
+                TempData["Message"] = "Bạn cần đăng nhập để xác nhận hóa đơn.";
+                return RedirectToAction("Login1", "Access1");
+            }
+            int maNhanVien = int.Parse(maNhanVienStr);
+
+            // Tìm hóa đơn theo mã hóa đơn id
+            var order = await _context.TbHoaDonBans.FindAsync(id);
+            if (order == null)
+            {
+                TempData["Message"] = "Không tìm thấy hóa đơn.";
+                return RedirectToAction("Index");
+            }
+
+            // Nếu hóa đơn đã được xác nhận, không cho xác nhận lại
+            if (order.TrangThai != "Chưa hoàn thành")
+            {
+                TempData["Message"] = "Hóa đơn đã được xác nhận.";
+                return RedirectToAction("Index");
+            }
+
+            // Cập nhật hóa đơn: gán MaNhanVien và chuyển trạng thái
+            order.MaNhanVien = maNhanVien;
+            order.TrangThai = "Hoàn thành";
+
+            _context.TbHoaDonBans.Update(order);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Xác nhận hóa đơn thành công.";
+            return RedirectToAction("Index");
+        }
+
         [Route("")]
         [Route("Index")]
         [Authentication]
@@ -27,6 +68,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             int pageNumber = page == null || page < 0 ? 1 : page.Value;
             var listItem = _context.TbHoaDonBans
                                    .Include(x => x.MaKhachHangNavigation)
+                                        .Include(x => x.MaNhanVienNavigation)
                                         .Include(x => x.MaQuanNavigation)// Load thông tin khách hàng
                                    .AsNoTracking()
                                    .OrderByDescending(x => x.NgayLap)
