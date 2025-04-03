@@ -13,5 +13,6 @@ namespace Web_CuaHangCafe.ViewModels
         // Thông tin chi tiết: nếu admin, đây là thông tin nhân viên; nếu user, là thông tin khách hàng
         public TbNhanVien? NhanVienInfo { get; set; }
         public TbKhachHang? KhachHangInfo { get; set; }
+        public string? MatKhau { get; internal set; }
     }
 }

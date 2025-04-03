@@ -1,7 +1,13 @@
 ﻿@model Web_CuaHangCafe.Models.TbPhieuNhapHang
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Chi tiết Phiếu nhập hàng";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+
+
+    var total = Model.TbPhieuNhapChiTiets != null
+                ? Model.TbPhieuNhapChiTiets.Sum(detail => detail.ThanhTien ?? (detail.SoLuong * detail.DonGia))
+                : 0;
 }
 
 <div class="container mt-3">
@@ -49,10 +55,16 @@
                             <td>@detail.MaNguyenLieuNavigation.TenNguyenLieu</td>
                             <td>@detail.SoLuong</td>
                             <td>@detail.DonGia.ToString("N2")</td>
-                            <td>@detail.ThanhTien?.ToString("N2")</td>
+                            <td>@(detail.ThanhTien?.ToString("N2") ?? (detail.SoLuong * detail.DonGia).ToString("N2"))</td>
                         </tr>
                     }
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-right"><strong>Tổng tiền:</strong></td>
+                        <td>@total.ToString("N2")</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     }

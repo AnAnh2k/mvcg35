@@ -76,22 +76,31 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         public IActionResult Details(int id)
         {
             var employee = _context.TbNhanViens
-                                .Include(x => x.TbTaiKhoans)
-                                  .Include(x => x.MaQuanNavigation)
-                                .Include(x => x.TbPhieuNhapHangs)
-                                
-                                    .ThenInclude(ph => ph.TbPhieuNhapChiTiets)
-                                .FirstOrDefault(x => x.MaNhanVien == id);
+                .Include(x => x.TbTaiKhoans) // Bao gồm tài khoản của nhân viên
+                .Include(x => x.MaQuanNavigation) // Bao gồm thông tin quán mà nhân viên thuộc về
+                .Include(x => x.TbHoaDonBans) // Bao gồm danh sách hóa đơn bán của nhân viên
+                    .ThenInclude(hd => hd.TbChiTietHoaDonBans) // Bao gồm chi tiết hóa đơn bán
+                .Include(x => x.TbPhieuNhapHangs) // Bao gồm danh sách phiếu nhập của nhân viên
+                    .ThenInclude(ph => ph.TbPhieuNhapChiTiets) // Bao gồm chi tiết phiếu nhập
+                    .ThenInclude(ct => ct.MaNguyenLieuNavigation)
+                  .Include(x => x.TbHoaDonBans) // Bao gồm danh sách hóa đơn bán của nhân viên
+                    .ThenInclude(hd => hd.TbChiTietHoaDonBans)
+                      .ThenInclude(sp => sp.MaSanPhamNavigation)
+                .Include(x => x.TbPhieuNhapHangs) // Bao gồm lại phiếu nhập
+                    .ThenInclude(ncc => ncc.MaNhaCungCapNavigation) // Bao gồm thông tin nhà cung cấp của phiếu nhập
+                .FirstOrDefault(x => x.MaNhanVien == id);
 
             if (employee == null)
             {
                 TempData["Message"] = "Không tìm thấy nhân viên.";
                 return RedirectToAction("Index", "NhanViens");
             }
+
             return View(employee);
         }
 
-     
+
+
 
         // GET: Admin/NhanViens/Create
         [Route("Create")]
@@ -165,35 +174,105 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         }
 
 
-        // Chỉnh sửa thông tin nhân viên
-        [Route("Edit")]
+        // GET: Admin/NhanViens/Edit/{id}
+        [Route("Edit/{id}")]
         [Authentication]
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var nhanVien = _context.TbNhanViens.Find(id);
-            if (nhanVien == null)
+            // Lấy thông tin nhân viên theo MaNhanVien
+            var employee = _context.TbNhanViens.FirstOrDefault(e => e.MaNhanVien == id);
+            if (employee == null)
             {
                 TempData["Message"] = "Không tìm thấy nhân viên cần sửa.";
                 return RedirectToAction("Index", "NhanViens");
             }
-            return View(nhanVien);
+
+            // Lấy tài khoản tương ứng của nhân viên (giả sử chỉ có 1 tài khoản cho mỗi nhân viên)
+            var account = _context.TbTaiKhoans.FirstOrDefault(a => a.MaNhanVien == id);
+
+            // Tạo view model tổng hợp
+            var viewModel = new EmployeeAccountViewModel
+            {
+                Employee = employee,
+                Account = account ?? new TbTaiKhoan() // Nếu chưa có tài khoản thì tạo mới
+            };
+
+            // Điền dữ liệu cho dropdown: Quán và Quyền
+            ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan", employee.MaQuan);
+            ViewBag.MaQuyen = new SelectList(_context.TbQuyens, "MaQuyen", "TenQuyen", account?.MaQuyen);
+
+            return View(viewModel);
         }
 
+        // POST: Admin/NhanViens/Edit
         [Route("Edit")]
         [Authentication]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(TbNhanVien nhanVien)
+        public IActionResult Edit(EmployeeAccountViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Entry(nhanVien).State = EntityState.Modified;
-                _context.SaveChanges();
-                TempData["Message"] = "Cập nhật nhân viên thành công.";
+                // Nếu ModelState không hợp lệ, đừng quên nạp lại dropdown
+                ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan", model.Employee.MaQuan);
+                ViewBag.MaQuyen = new SelectList(_context.TbQuyens, "MaQuyen", "TenQuyen", model.Account.MaQuyen);
+                return View(model);
+            }
+
+            // Cập nhật thông tin nhân viên
+            var employeeFromDB = _context.TbNhanViens.FirstOrDefault(e => e.MaNhanVien == model.Employee.MaNhanVien);
+            if (employeeFromDB == null)
+            {
+                TempData["Message"] = "Không tìm thấy nhân viên cần sửa.";
                 return RedirectToAction("Index", "NhanViens");
             }
-            return View(nhanVien);
+            // Cập nhật các thông tin của nhân viên
+            employeeFromDB.HoTen = model.Employee.HoTen;
+            employeeFromDB.DiaChi = model.Employee.DiaChi;
+            employeeFromDB.Email = model.Employee.Email;
+            employeeFromDB.NgaySinh = model.Employee.NgaySinh;
+            employeeFromDB.GioiTinh = model.Employee.GioiTinh;
+            employeeFromDB.ChucVu = model.Employee.ChucVu;
+            employeeFromDB.Sdt = model.Employee.Sdt;
+            employeeFromDB.SoCccd = model.Employee.SoCccd;
+            employeeFromDB.LuongCoBan = model.Employee.LuongCoBan;
+            employeeFromDB.HeSoLuong = model.Employee.HeSoLuong;
+            employeeFromDB.MaQuan = model.Employee.MaQuan;
+
+            _context.TbNhanViens.Update(employeeFromDB);
+
+            // Cập nhật thông tin tài khoản
+            var accountFromDB = _context.TbTaiKhoans.FirstOrDefault(a => a.MaNhanVien == model.Employee.MaNhanVien);
+            if (accountFromDB != null)
+            {
+                accountFromDB.TenTaiKhoan = model.Account.TenTaiKhoan;
+
+                // Nếu mật khẩu không trống, băm mật khẩu mới và cập nhật lại
+                if (!string.IsNullOrWhiteSpace(model.Account.MatKhau))
+                {
+                    accountFromDB.MatKhau = HashPassword(model.Account.MatKhau);
+                }
+                accountFromDB.MaQuyen = model.Account.MaQuyen;
+
+                _context.TbTaiKhoans.Update(accountFromDB);
+            }
+            else
+            {
+                // Nếu chưa có tài khoản, tạo mới
+                var newAccount = new TbTaiKhoan
+                {
+                    MaNhanVien = model.Employee.MaNhanVien,
+                    TenTaiKhoan = model.Account.TenTaiKhoan,
+                    MatKhau = string.IsNullOrWhiteSpace(model.Account.MatKhau) ? "" : HashPassword(model.Account.MatKhau),
+                    MaQuyen = model.Account.MaQuyen
+                };
+                _context.TbTaiKhoans.Add(newAccount);
+            }
+
+            _context.SaveChanges();
+            TempData["Message"] = "Cập nhật nhân viên thành công.";
+            return RedirectToAction("Index", "NhanViens");
         }
 
         // Xoá nhân viên (với xác nhận và xoá cascade các thông tin liên quan: tài khoản, phiếu nhập hàng – bao gồm chi tiết phiếu nhập)

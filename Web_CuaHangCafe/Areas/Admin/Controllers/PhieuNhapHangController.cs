@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Web_CuaHangCafe.Areas.Admin.ViewModels;
 using Web_CuaHangCafe.Data;
 using Web_CuaHangCafe.Models;
 using Web_CuaHangCafe.Models.Authentication;
+using Web_CuaHangCafe.ViewModels;
 using X.PagedList;
 
 namespace Web_CuaHangCafe.Areas.Admin.Controllers
@@ -23,6 +25,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             _context = context;
         }
 
+
         // GET: Admin/PhieuNhapHang
         [Route("")]
         [Route("Index")]
@@ -33,16 +36,23 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             int pageNumber = (page == null || page < 0) ? 1 : page.Value;
 
             var listItem = await _context.TbPhieuNhapHangs
-                .Include(p => p.MaQuanNavigation)
-                .Include(p => p.MaNhanVienNavigation)
-                .Include(p => p.MaNhaCungCapNavigation)
-                .AsNoTracking()
-                .OrderByDescending(p => p.NgayLap)
-                .ToListAsync();
+                 .Include(p => p.MaQuanNavigation)
+                 .Include(p => p.MaNhanVienNavigation)
+                 .Include(p => p.MaNhaCungCapNavigation)
+                 .Include(p => p.TbPhieuNhapChiTiets) // Bao gồm chi tiết phiếu nhập
+                 .AsNoTracking()
+                 .OrderByDescending(p => p.NgayLap)
+                 .ToListAsync();
+
+        
+
+      
+
             var pagedList = new PagedList<TbPhieuNhapHang>(listItem, pageNumber, pageSize);
 
             return View(pagedList);
         }
+
 
         // GET: Admin/PhieuNhapHang/Search?search=...
         [Route("Search")]
@@ -109,43 +119,220 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             return View(phieuNhap);
         }
 
-        // GET: Admin/PhieuNhapHang/Create
-        [Route("Create")]
-        [Authentication]
+        //[Route("Nhap")]
+        //[HttpGet]
+        //public IActionResult Nhap()
+        //{
+        //    var dsNguyenLieu = _context.TbNguyenLieus
+        //                            .AsNoTracking()
+        //                            .OrderBy(nl => nl.TenNguyenLieu)
+        //                            .ToList();
+                
+        //    var vm = new Web_CuaHangCafe.ViewModels.PhieuNhapViewModel
+        //    {
+        //        NgayNhap = DateTime.Now,
+        //        GhiChu = string.Empty,
+        //        ChiTietNhap = dsNguyenLieu.Select(nl => new Web_CuaHangCafe.ViewModels.PhieuNhapChiTietViewModel
+        //        {
+        //            MaNguyenLieu = nl.MaNguyenLieu,
+        //            TenNguyenLieu = nl.TenNguyenLieu,
+        //            SoLuongNhap = 0,
+        //            DonGiaNhap = nl.DonGia
+        //        }).ToList()
+        //    };
+
+        //    // Lấy mã nhân viên từ session và truy vấn tên
+        //    var maNhanVienStr = HttpContext.Session.GetString("MaNhanVien");
+        //    int maNhanVien = 0;
+        //    string tenNhanVien = string.Empty;
+        //    if (!string.IsNullOrEmpty(maNhanVienStr))
+        //    {
+        //        maNhanVien = int.Parse(maNhanVienStr);
+        //        var nhanVien = _context.TbNhanViens.FirstOrDefault(x => x.MaNhanVien == maNhanVien);
+        //        if (nhanVien != null)
+        //        {
+        //            tenNhanVien = nhanVien.HoTen;
+        //        }
+        //    }
+
+        //    // Thay vì tạo dropdown, ta chuyển sang hiển thị thông tin cố định
+         
+
+        //    //ViewBag.MaNhanVien = new SelectList(_context.TbNhanViens, "MaNhanVien", "HoTen");
+        //    ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+        //    ViewBag.MaNhaCungCap = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
+        //    ViewBag.MaNhanVien = maNhanVien;
+        //    ViewBag.TenNhanVien = tenNhanVien;
+        //    return View(vm);
+        //}
+
+        [Route("Nhap")]
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Nhap()
         {
-            var model = new TbPhieuNhapHang
+            // Lấy mã nhân viên từ session
+            var maNhanVienStr = HttpContext.Session.GetString("MaNhanVien");
+            int maNhanVien = 0;
+            string tenNhanVien = string.Empty;
+            if (!string.IsNullOrEmpty(maNhanVienStr))
             {
-                NgayLap = DateTime.Now
+                maNhanVien = int.Parse(maNhanVienStr);
+                // Truy vấn để lấy tên nhân viên
+                var nhanVien = _context.TbNhanViens.FirstOrDefault(x => x.MaNhanVien == maNhanVien);
+                if (nhanVien != null)
+                {
+                    tenNhanVien = nhanVien.HoTen;
+                }
+            }
+
+            // Khởi tạo view model cho phiếu nhập
+            var vm = new Web_CuaHangCafe.ViewModels.PhieuNhapViewModel
+            {
+                NgayNhap = DateTime.Now,
+                GhiChu = string.Empty,
+                ChiTietNhap = _context.TbNguyenLieus
+                                       .AsNoTracking()
+                                       .OrderBy(nl => nl.TenNguyenLieu)
+                                       .Select(nl => new Web_CuaHangCafe.ViewModels.PhieuNhapChiTietViewModel
+                                       {
+                                           MaNguyenLieu = nl.MaNguyenLieu,
+                                           TenNguyenLieu = nl.TenNguyenLieu,
+                                           SoLuongNhap = 0,
+                                           DonGiaNhap = nl.DonGia
+                                       }).ToList()
             };
 
-            ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
-            ViewData["MaNhanVien"] = new SelectList(_context.TbNhanViens, "MaNhanVien", "HoTen");
-            ViewData["MaNhaCungCap"] = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
+            // Lấy các SelectList cho dropdown chỉ đối với Quán và Nhà cung cấp
+            ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+            ViewBag.MaNhaCungCap = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
 
-            return View(model);
+            // Lưu thông tin nhân viên vào ViewBag
+            ViewBag.MaNhanVien = maNhanVien;
+            ViewBag.TenNhanVien = tenNhanVien;
+
+            return View(vm);
         }
 
-        // POST: Admin/PhieuNhapHang/Create
-        [Route("Create")]
-        [Authentication]
+
+
+
+
+
+        [Route("Nhap")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaQuan,NgayLap,MaNhanVien,MaNhaCungCap,GhiChu")] TbPhieuNhapHang phieuNhap)
+        public async Task<IActionResult> Nhap(Web_CuaHangCafe.ViewModels.PhieuNhapViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                phieuNhap.MaPhieuNhap = Guid.NewGuid();
-                _context.TbPhieuNhapHangs.Add(phieuNhap);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+                ViewBag.MaNhaCungCap = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
+                return View(model);
             }
-            ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan", phieuNhap.MaQuan);
-            ViewData["MaNhanVien"] = new SelectList(_context.TbNhanViens, "MaNhanVien", "HoTen", phieuNhap.MaNhanVien);
-            ViewData["MaNhaCungCap"] = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap", phieuNhap.MaNhaCungCap);
-            return View(phieuNhap);
+
+            // Lấy mã nhân viên từ session
+            var maNhanVienStr = HttpContext.Session.GetString("MaNhanVien");
+            if (string.IsNullOrEmpty(maNhanVienStr))
+            {
+                // Nếu không tìm thấy, báo lỗi phù hợp.
+                ModelState.AddModelError("", "Không thể xác định được nhân viên đăng nhập.");
+                ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+                ViewBag.MaNhaCungCap = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
+            // Nếu muốn hiển thị mã nhân viên
+               // Nếu muốn hiển thị tên nhân viên
+                return View(model);
+            }
+            int maNhanVien = int.Parse(maNhanVienStr);
+
+            // Tạo header phiếu nhập sử dụng thông tin từ view model và mã nhân viên từ session
+            var phieuNhap = new TbPhieuNhapHang
+            {
+
+                MaPhieuNhap = Guid.NewGuid(),
+                NgayLap = model.NgayNhap,
+                GhiChu = model.GhiChu,
+                MaNhanVien = maNhanVien,
+                MaQuan = model.MaQuan,
+                MaNhaCungCap = model.MaNhaCungCap
+
+            };
+
+            _context.TbPhieuNhapHangs.Add(phieuNhap);
+            await _context.SaveChangesAsync();
+
+            // Xử lý danh sách chi tiết phiếu nhập
+            foreach (var ct in model.ChiTietNhap)
+            {
+                if (ct.SoLuongNhap > 0)
+                {
+                    var detail = new TbPhieuNhapChiTiet
+                    {
+                        MaPhieuNhap = phieuNhap.MaPhieuNhap,
+                        MaNguyenLieu = ct.MaNguyenLieu,
+                        SoLuong = ct.SoLuongNhap,
+                        DonGia = ct.DonGiaNhap
+                    };
+                    _context.TbPhieuNhapChiTiets.Add(detail);
+
+                    // Cập nhật số lượng tồn kho của nguyên liệu
+                    var nguyenLieu = await _context.TbNguyenLieus.FindAsync(ct.MaNguyenLieu);
+                    if (nguyenLieu != null)
+                    {
+                        nguyenLieu.SoLuong += ct.SoLuongNhap;
+                        _context.TbNguyenLieus.Update(nguyenLieu);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Phiếu nhập đã được lưu thành công.";
+            return RedirectToAction("Index", "PhieuNhapHangs");
         }
+
+
+
+
+
+
+
+        //// GET: Admin/PhieuNhapHang/Create
+        //[Route("Create")]
+        //[Authentication]
+        //[HttpGet]
+        //public IActionResult Create()
+        //{
+        //    var model = new TbPhieuNhapHang
+        //    {
+        //        NgayLap = DateTime.Now
+        //    };
+
+        //    ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan");
+        //    ViewData["MaNhanVien"] = new SelectList(_context.TbNhanViens, "MaNhanVien", "HoTen");
+        //    ViewData["MaNhaCungCap"] = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap");
+
+        //    return View(model);
+        //}
+
+        //// POST: Admin/PhieuNhapHang/Create
+        //[Route("Create")]
+        //[Authentication]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("MaQuan,NgayLap,MaNhanVien,MaNhaCungCap,GhiChu")] TbPhieuNhapHang phieuNhap)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        phieuNhap.MaPhieuNhap = Guid.NewGuid();
+        //        _context.TbPhieuNhapHangs.Add(phieuNhap);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    ViewData["MaQuan"] = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan", phieuNhap.MaQuan);
+        //    ViewData["MaNhanVien"] = new SelectList(_context.TbNhanViens, "MaNhanVien", "HoTen", phieuNhap.MaNhanVien);
+        //    ViewData["MaNhaCungCap"] = new SelectList(_context.TbNhaCungCaps, "MaNhaCungCap", "TenNhaCungCap", phieuNhap.MaNhaCungCap);
+        //    return View(phieuNhap);
+        //}
 
         // GET: Admin/PhieuNhapHang/Edit/{id}
         [Route("Edit/{id}")]

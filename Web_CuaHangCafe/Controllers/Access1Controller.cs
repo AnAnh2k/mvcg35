@@ -104,8 +104,7 @@ namespace Web_CuaHangCafe.Controllers
         {
             return View();
         }
-
-       // POST: /Access1/Login(Kiểm tra tài khoản trong cả 2 bảng)
+ // POST: /Access1/Login(Kiểm tra tài khoản trong cả 2 bảng)
         [HttpPost]
         public IActionResult Login1(LoginViewModel model)
         {
@@ -148,6 +147,7 @@ namespace Web_CuaHangCafe.Controllers
         }
 
 
+      
 
 
         // Đăng xuất

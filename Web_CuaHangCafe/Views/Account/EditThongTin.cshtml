@@ -15,8 +15,10 @@
         <div class="form-group">
             <label asp-for="TenTaiKhoan" class="control-label"></label>
             @* Giả sử tên tài khoản không cho phép thay đổi, vì vậy render readonly *@
-            <input asp-for="TenTaiKhoan" class="form-control"  />
+            <input asp-for="TenTaiKhoan" class="form-control" readonly />
             <span asp-validation-for="TenTaiKhoan" class="text-danger"></span>
+            <label asp-for="MatKhau" class="control-label"></label>
+            <input asp-for="MatKhau" class="form-control" type="password" placeholder="Nhập mật khẩu mới nếu muốn đổi" />
         </div>
         @if (Model.Role == "Admin")
         {

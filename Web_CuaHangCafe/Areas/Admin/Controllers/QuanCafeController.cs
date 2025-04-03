@@ -37,20 +37,29 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         }
 
         // GET: /Admin/QuanCafe/Details/{id}
+        [Route("Details/{id}")]
         [Authentication]
-        [Route("Details/{id:int}")]
-        public async Task<IActionResult> Details(int? id)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-                return NotFound();
-
             var quanCafe = await _context.TbQuanCafes
-                .FirstOrDefaultAsync(q => q.MaQuan == id);
-            if (quanCafe == null)
-                return NotFound();
+                   .Include(nv => nv.TbNhanViens)
+                     .Include(pn => pn.TbPhieuNhapHangs)
+                      .ThenInclude(hd => hd.TbPhieuNhapChiTiets)
+                 .Include(q => q.TbHoaDonBans) // Nạp danh sách hóa đơn bán của quán
+                     .ThenInclude(hd => hd.TbChiTietHoaDonBans) // Nạp chi tiết của mỗi hóa đơn
+                         .ThenInclude(ct => ct.MaSanPhamNavigation) // Nạp thông tin sản phẩm của chi tiết hóa đơn
+                 .FirstOrDefaultAsync(q => q.MaQuan == id);
 
+            if (quanCafe == null)
+            {
+                TempData["Message"] = "Không tìm thấy chi tiết quán café.";
+                return RedirectToAction("Index", "QuanCafe");
+            }
             return View(quanCafe);
         }
+
+
 
         // GET: /Admin/QuanCafe/Create
         [Route("Create")]

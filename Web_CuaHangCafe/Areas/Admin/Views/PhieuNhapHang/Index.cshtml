@@ -29,7 +29,7 @@
         </div>
     </div>
     <p>
-        <a asp-action="Create" class="btn btn-secondary">Thêm mới</a>
+        <a asp-action="Nhap" class="btn btn-secondary">Thêm mới</a>
     </p>
     <p id="status-message">@TempData["Message"]</p>
     <div class="table-responsive">
@@ -42,6 +42,8 @@
                     <th>Nhân viên</th>
                     <th>Nhà cung cấp</th>
                     <th>Ghi chú</th>
+                    <th>Tổng tiền</th>
+              
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -56,6 +58,14 @@
                         <td>@(item.MaNhaCungCapNavigation?.TenNhaCungCap ?? "N/A")</td>
                         <td>@item.GhiChu</td>
                         <td>
+                            @{
+                                // Nếu liên kết các chi tiết được nạp, tính tổng tiền:
+                                var tongTien = item.TbPhieuNhapChiTiets != null ? item.TbPhieuNhapChiTiets.Sum(ct => ct.SoLuong * ct.DonGia) : 0;
+                            }
+                            @tongTien.ToString("n2")
+                        </td>
+                      
+                        <td>
                             <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.MaPhieuNhap">
                                 Xem chi tiết
                             </a>
@@ -68,6 +78,7 @@
                         </td>
                     </tr>
                 }
+
             </tbody>
         </table>
     </div>
