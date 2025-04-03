@@ -287,7 +287,7 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Message"] = "Phiếu nhập đã được lưu thành công.";
-            return RedirectToAction("Index", "PhieuNhapHangs");
+            return RedirectToAction("Index", "PhieuNhapHang");
         }
 
 
