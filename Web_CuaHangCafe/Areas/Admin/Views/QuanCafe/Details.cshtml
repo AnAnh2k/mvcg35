@@ -233,8 +233,16 @@
                             <tr>
                                 <th>Mã nhân viên</th>
                                 <th>Họ tên</th>
+                                <th>Địa chỉ</th>
+                                <th>Ngày sinh</th>
+                                <th>Giới tính</th>
+                                <th>Chức vụ</th>
                                 <th>SĐT</th>
+                                <th>Số CCCD</th>
                                 <th>Email</th>
+                                <th>Lương cơ bản</th>
+                                <th>Hệ số lương</th>
+                                <th>Lương</th
                             </tr>
                         </thead>
                         <tbody>
@@ -243,8 +251,16 @@
                                 <tr>
                                     <td>@nv.MaNhanVien</td>
                                     <td>@nv.HoTen</td>
+                                    <td>@(nv.DiaChi ?? "N/A")</td>
+                                    <td>@(nv.NgaySinh?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                    <td>@(nv.GioiTinh ?? "N/A")</td>
+                                    <td>@nv.ChucVu</td>
                                     <td>@nv.Sdt</td>
-                                    <td>@nv.Email</td>
+                                    <td>@nv.SoCccd</td>
+                                    <td>@(nv.Email ?? "N/A")</td>
+                                    <td>@nv.LuongCoBan.ToString("N2")</td>
+                                    <td>@nv.HeSoLuong.ToString("N2")</td>
+                                    <td>@((nv.HeSoLuong * nv.LuongCoBan).ToString("N2"))</td>
                                 </tr>
                             }
                         </tbody>
@@ -256,6 +272,7 @@
                 <p>Không có nhân viên nào.</p>
             }
         </div>
+
 
         
 

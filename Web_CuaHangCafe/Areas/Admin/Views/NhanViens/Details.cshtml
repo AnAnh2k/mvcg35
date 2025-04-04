@@ -45,6 +45,17 @@
 
                 <dt class="col-sm-3">Số điện thoại</dt>
                 <dd class="col-sm-9">@Model.Sdt</dd>
+                <dt class="col-sm-3">Số CCCD</dt>
+                <dd class="col-sm-9">@Model.SoCccd</dd>
+                <dt class="col-sm-3">Lương cơ bản</dt>
+                <dd class="col-sm-9">@((Model.LuongCoBan).ToString("N2"))</dd>
+                <dt class="col-sm-3">Hệ số lương</dt>
+                <dd class="col-sm-9">@Model.HeSoLuong</dd>
+                <dt class="col-sm-3">Lương</dt>
+                <dd class="col-sm-9">@((Model.HeSoLuong * Model.LuongCoBan).ToString("N2"))</dd>
+
+                <dt class="col-sm-3">Số điện thoại</dt>
+                <dd class="col-sm-9">@Model.Sdt</dd>
 
                 <dt class="col-sm-3">Email</dt>
                 <dd class="col-sm-9">@Model.Email</dd>
