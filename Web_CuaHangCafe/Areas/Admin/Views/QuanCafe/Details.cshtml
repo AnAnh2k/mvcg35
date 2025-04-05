@@ -34,6 +34,11 @@
                 Nhân viên
             </a>
         </li>
+          <li class="nav-item">
+            <a class="nav-link" id="report-tab" data-toggle="tab" href="#report" role="tab" aria-controls="report" aria-selected="false">
+                Báo cáo Thu – Chi
+            </a>
+        </li>
 
     </ul>
 
@@ -271,6 +276,45 @@
             {
                 <p>Không có nhân viên nào.</p>
             }
+        </div>
+
+        <!-- Tab Báo cáo Thu – Chi -->
+        <div class="tab-pane fade p-3" id="report" role="tabpanel" aria-labelledby="report-tab">
+            <h4>Báo cáo Thu – Chi của Quán Café</h4>
+            @{
+                // Tính tổng hoá đơn bán làm doanh thu
+                decimal totalSales = Model.TbHoaDonBans != null ? Model.TbHoaDonBans.Sum(x => x.TongTien) : 0;
+                // Tính tổng phiếu nhập làm chi phí
+                decimal totalImports = 0;
+                if (Model.TbPhieuNhapHangs != null && Model.TbPhieuNhapHangs.Any())
+                {
+                    totalImports = Model.TbPhieuNhapHangs.Sum(pn => 
+                        pn.TbPhieuNhapChiTiets != null ? pn.TbPhieuNhapChiTiets.Sum(ct => ct.ThanhTien ?? 0) : 0);
+                }
+                decimal profit = totalSales - totalImports;
+            }
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Loại</th>
+                        <th>Số tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tổng hoá đơn bán (Doanh thu)</td>
+                        <td>@totalSales.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td>Tổng phiếu nhập (Chi phí)</td>
+                        <td>@totalImports.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td>Lãi (Doanh thu - Chi phí)</td>
+                        <td>@profit.ToString("N2")</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
 

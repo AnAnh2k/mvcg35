@@ -6,24 +6,38 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 // Đăng ký IHttpContextAccessor
 builder.Services.AddHttpContextAccessor();
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(connectionString));
+
+// Lấy connection string từ cấu hình
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+// Cấu hình DbContext với SQL Server
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Đăng ký các repository và view component nếu cần
 builder.Services.AddScoped<INhomSpRepository, NhomSpRepository>();
 builder.Services.AddScoped<ShoppingCartSummaryViewComponent>();
 
+// Cấu hình cache phân tán và Session
 builder.Services.AddDistributedMemoryCache();
-
-builder.Services.AddSession();
+builder.Services.AddSession(options =>
+{
+    // Bạn có thể thiết lập các tùy chọn cho Session nếu cần
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Cấu hình pipeline xử lý request
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -32,8 +46,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+// Đảm bảo session middleware được gọi trước authorization
 app.UseSession();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
