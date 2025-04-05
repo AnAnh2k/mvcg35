@@ -206,28 +206,29 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
         }
 
         // POST: Admin/NhanViens/Edit
-        [Route("Edit")]
+        [Route("Edit/{id}")]
         [Authentication]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(EmployeeAccountViewModel model)
+        public IActionResult Edit(int id, EmployeeAccountViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Nếu ModelState không hợp lệ, đừng quên nạp lại dropdown
                 ViewBag.MaQuan = new SelectList(_context.TbQuanCafes, "MaQuan", "TenQuan", model.Employee.MaQuan);
                 ViewBag.MaQuyen = new SelectList(_context.TbQuyens, "MaQuyen", "TenQuyen", model.Account.MaQuyen);
                 return View(model);
             }
 
-            // Cập nhật thông tin nhân viên
-            var employeeFromDB = _context.TbNhanViens.FirstOrDefault(e => e.MaNhanVien == model.Employee.MaNhanVien);
+            var employeeFromDB = _context.TbNhanViens
+                .Include(e => e.TbTaiKhoans)
+                .FirstOrDefault(e => e.MaNhanVien == model.Employee.MaNhanVien);
             if (employeeFromDB == null)
             {
                 TempData["Message"] = "Không tìm thấy nhân viên cần sửa.";
                 return RedirectToAction("Index", "NhanViens");
             }
-            // Cập nhật các thông tin của nhân viên
+
+            // Cập nhật thông tin nhân viên
             employeeFromDB.HoTen = model.Employee.HoTen;
             employeeFromDB.DiaChi = model.Employee.DiaChi;
             employeeFromDB.Email = model.Employee.Email;
@@ -247,19 +248,15 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             if (accountFromDB != null)
             {
                 accountFromDB.TenTaiKhoan = model.Account.TenTaiKhoan;
-
-                // Nếu mật khẩu không trống, băm mật khẩu mới và cập nhật lại
                 if (!string.IsNullOrWhiteSpace(model.Account.MatKhau))
                 {
                     accountFromDB.MatKhau = HashPassword(model.Account.MatKhau);
                 }
                 accountFromDB.MaQuyen = model.Account.MaQuyen;
-
                 _context.TbTaiKhoans.Update(accountFromDB);
             }
             else
             {
-                // Nếu chưa có tài khoản, tạo mới
                 var newAccount = new TbTaiKhoan
                 {
                     MaNhanVien = model.Employee.MaNhanVien,
@@ -274,6 +271,8 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
             TempData["Message"] = "Cập nhật nhân viên thành công.";
             return RedirectToAction("Index", "NhanViens");
         }
+
+
 
         // Xoá nhân viên (với xác nhận và xoá cascade các thông tin liên quan: tài khoản, phiếu nhập hàng – bao gồm chi tiết phiếu nhập)
         [Route("Delete")]

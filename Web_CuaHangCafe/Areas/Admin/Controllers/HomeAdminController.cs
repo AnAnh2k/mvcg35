@@ -13,18 +13,19 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("HomeAdmin")]
-    public class HomeAdminController : Controller
+    public class HomeEmployeeController : Controller
     {
         private readonly Data.ApplicationDbContext _context;
         IWebHostEnvironment _hostEnvironment;
 
-        public HomeAdminController(Data.ApplicationDbContext context, IWebHostEnvironment hc)
+        public HomeEmployeeController(Data.ApplicationDbContext context, IWebHostEnvironment hc)
         {
             _context = context;
             _hostEnvironment = hc;
         }
 
         [Route("")]
+        [Route("Index")]
         [Authentication]
         public IActionResult Index(int? page)
         {

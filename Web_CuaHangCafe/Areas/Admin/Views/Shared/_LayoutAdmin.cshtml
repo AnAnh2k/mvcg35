@@ -1,4 +1,7 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    var role = Context.Session.GetString("Role");
+}
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -58,82 +61,109 @@
             <!-- Sidebar -->
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav nav-bar-fixed">
+
                     <li class="nav-item">
                         <a asp-controller="HomeAdmin" asp-action="Index" class="nav-link">
-                            <i class="fas fa-list-ul"></i>
+                            <i class="fas fa-box-open"></i> <!-- Icon mới: Sản phẩm -->
                             <span class="menu-title">Quản lí sản phẩm</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a asp-controller="GroupsProduct" asp-action="Index" class="nav-link">
-                            <i class="fas fa-table"></i>
+                            <i class="fas fa-layer-group"></i> <!-- Icon mới: Nhóm sản phẩm -->
                             <span class="menu-title">Quản lí nhóm sản phẩm</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a asp-controller="NguyenLieus" asp-action="Index" class="nav-link">
-                            <i class="fas fa-list-ul"></i>
+                            <i class="fas fa-seedling"></i> <!-- Icon mới: Nguyên liệu -->
                             <span class="menu-title">Quản lí nguyên liệu</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a asp-controller="ThuChi" asp-action="All" class="nav-link">
-                            <i class="fas fa-file-invoice"></i>
-                            <span class="menu-title">Quản lí thu chi</span>
-                        </a>
-                    </li>
+                    @if (role != "Employee")
+
+                    {
+
+                        <li class="nav-item">
+                            <a asp-controller="ThuChi" asp-action="All" class="nav-link">
+                                <i class="fas fa-chart-line"></i> <!-- Icon mới: Thu chi -->
+                                <span class="menu-title">Quản lí thu chi</span>
+                            </a>
+                        </li>
+
+                    }
                     <li class="nav-item">
                         <a asp-controller="Bill" asp-action="Index" class="nav-link">
-                            <i class="fas fa-file-invoice"></i>
+                            <i class="fas fa-receipt"></i> <!-- Icon mới: Hóa đơn -->
                             <span class="menu-title">Quản lí hoá đơn</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a asp-controller="PhieuNhapHang" asp-action="Index" class="nav-link">
-                            <i class="fas fa-file-invoice"></i>
+                            <i class="fas fa-truck-loading"></i> <!-- Icon mới: Phiếu nhập -->
                             <span class="menu-title">Quản lí phiếu nhập</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a asp-controller="NhaCungCap" asp-action="Index" class="nav-link">
-                            <i class="fas fa-file-invoice"></i>
-                            <span class="menu-title">Quản lí nhà cung cấp</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Clients" asp-action="Index" class="nav-link">
-                            <i class="fas fa-user"></i>
-                            <span class="menu-title">Quản lí khách hàng</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="NhanViens" asp-action="Index" class="nav-link">
-                            <i class="fas fa-user"></i>
-                            <span class="menu-title">Quản lí nhân viên</span>
-                        </a>
-                    </li>
+                    @if (role != "Employee")
+
+                    {
+
+                        <li class="nav-item">
+                            <a asp-controller="NhaCungCap" asp-action="Index" class="nav-link">
+                                <i class="fas fa-warehouse"></i> <!-- Icon mới: Nhà cung cấp -->
+                                <span class="menu-title">Quản lí nhà cung cấp</span>
+                            </a>
+                        </li>
+
+                    }
+                    @if (role != "Employee")
+
+                    {
+
+                        <li class="nav-item">
+                            <a asp-controller="Clients" asp-action="Index" class="nav-link">
+                                <i class="fas fa-users"></i> <!-- Icon mới: Khách hàng -->
+                                <span class="menu-title">Quản lí khách hàng</span>
+                            </a>
+                        </li>
+
+                    }
+                    @if (role != "Employee")
+
+                    {
+
+                        <li class="nav-item">
+                            <a asp-controller="NhanViens" asp-action="Index" class="nav-link">
+                                <i class="fas fa-user-tie"></i> <!-- Icon mới: Nhân viên -->
+                                <span class="menu-title">Quản lí nhân viên</span>
+                            </a>
+                        </li>
+
+                    }
                     <li class="nav-item">
                         <a asp-controller="NewsManage" asp-action="Index" class="nav-link">
-                            <i class="fas fa-newspaper"></i>
+                            <i class="fas fa-newspaper"></i> <!-- Icon mới: Tin tức -->
                             <span class="menu-title">Quản lí bài viết</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a asp-controller="QuanCafe" asp-action="Index" class="nav-link">
-                            <i class="fas fa-comments"></i>
-                            <span class="menu-title">Quản lí thông tin của hàng</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Accounts" asp-action="Index" class="nav-link">
-                            <i class="fas fa-lock"></i>
-                            <span class="menu-title">Quản lí tài khoản truy cập</span>
-                        </a>
-                    </li>
-            
+                    @if (role != "Employee")
+
+                    {
+
+                        <li class="nav-item">
+                            <a asp-controller="QuanCafe" asp-action="Index" class="nav-link">
+                                <i class="fas fa-store"></i> <!-- Icon mới: Thông tin cửa hàng -->
+                                <span class="menu-title">Quản lí thông tin cửa hàng</span>
+                            </a>
+                        </li>
+
+                    }
+
+                  
                     <li class="nav-item">
                         <a asp-controller="Access1" asp-action="Logout" class="nav-link">
-                            <i class="fas fa-sign-out-alt"></i>
+                            <i class="fas fa-sign-out-alt"></i> <!-- Icon đăng xuất giữ nguyên -->
                             <span class="menu-title">Đăng xuất</span>
                         </a>
                     </li>

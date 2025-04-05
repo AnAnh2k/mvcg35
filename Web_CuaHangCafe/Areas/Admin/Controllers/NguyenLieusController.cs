@@ -9,11 +9,11 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/NguyenLieus")]
-    public class NguyenLieusController : Controller
+    public class EmployeeNguyenLieusController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public NguyenLieusController(ApplicationDbContext context)
+        public EmployeeNguyenLieusController(ApplicationDbContext context)
         {
             _context = context;
         }

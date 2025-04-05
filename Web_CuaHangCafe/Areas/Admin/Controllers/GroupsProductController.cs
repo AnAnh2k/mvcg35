@@ -10,11 +10,11 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/GroupsProduct")]
-    public class GroupsProductController : Controller
+    public class EmployeeGroupsProductController : Controller
     {
         private readonly Data.ApplicationDbContext _context;
 
-        public GroupsProductController(Data.ApplicationDbContext context)
+        public EmployeeGroupsProductController(Data.ApplicationDbContext context)
         {
             _context = context;
         }

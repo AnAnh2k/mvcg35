@@ -16,11 +16,11 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/PhieuNhapHang")]
-    public class PhieuNhapHangController : Controller
+    public class EmployeePhieuNhapHangController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public PhieuNhapHangController(ApplicationDbContext context)
+        public EmployeePhieuNhapHangController(ApplicationDbContext context)
         {
             _context = context;
         }

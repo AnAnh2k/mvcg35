@@ -119,12 +119,23 @@ namespace Web_CuaHangCafe.Controllers
                 .FirstOrDefault(x => x.TenTaiKhoan == model.TenTaiKhoan && x.MatKhau == hashPassword);
             if (tkAdmin != null)
             {
-                // Gán thông tin phiên (Session) cho Admin
-                HttpContext.Session.SetString("TenTaiKhoan", tkAdmin.TenTaiKhoan);
-                HttpContext.Session.SetString("Role", "Admin");
-                // Lưu MaNhanVien (nếu không null)
-                HttpContext.Session.SetString("MaNhanVien", tkAdmin.MaNhanVien.ToString());
-                return RedirectToAction("Index", "Home");
+                // Giả sử: MaQuyen == 1 => Admin, MaQuyen == 2 => Employee
+                if (tkAdmin.MaQuyen == 1)
+                {
+                    // Gán thông tin phiên cho Admin
+                    HttpContext.Session.SetString("TenTaiKhoan", tkAdmin.TenTaiKhoan);
+                    HttpContext.Session.SetString("Role", "Admin");
+                    HttpContext.Session.SetString("MaNhanVien", tkAdmin.MaNhanVien.ToString());
+                    return RedirectToAction("Index", "Home");
+                }
+                else if (tkAdmin.MaQuyen == 3)
+                {
+                    // Gán thông tin phiên cho Employee
+                    HttpContext.Session.SetString("TenTaiKhoan", tkAdmin.TenTaiKhoan);
+                    HttpContext.Session.SetString("Role", "Employee");
+                    HttpContext.Session.SetString("MaNhanVien", tkAdmin.MaNhanVien.ToString());
+                    return RedirectToAction("Index", "Home");
+                }
             }
 
             // Kiểm tra tài khoản khách hàng trong bảng tbTaiKhoanKhs

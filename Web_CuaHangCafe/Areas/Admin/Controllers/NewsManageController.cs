@@ -11,11 +11,11 @@ namespace Web_CuaHangCafe.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/News")]
-    public class NewsManageController : Controller
+    public class EmployeeNewsManageController : Controller
     {
         private readonly Data.ApplicationDbContext _context;
 
-        public NewsManageController(Data.ApplicationDbContext context)
+        public EmployeeNewsManageController(Data.ApplicationDbContext context)
         {
             _context = context;
         }

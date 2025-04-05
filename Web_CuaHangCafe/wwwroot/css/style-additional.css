@@ -82,7 +82,7 @@
 .pagination__margin {
     margin-right: 6px;
 }
-
+/*
 .user-menu {
     position: relative;
 }
@@ -100,17 +100,83 @@
     .user-menu.show .dropdown-menu,
     .user-menu:focus-within .dropdown-menu {
         display: block !important;
-    }
-/*
-.user-menu {
-    position: relative;
+    }*/
+/* Custom dropdown không dùng Bootstrap */
+/* Custom Dropdown cải tiến */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-    .user-menu .dropdown-menu {
-        position: absolute;
-        right: 0;
-        top: 100%;
-        z-index: 9999;
-    }
-*/
+/* Dropdown Toggle Button */
+.custom-dropdown .dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.custom-dropdown .dropdown-toggle:hover {
+  background-color: #f8f9fa;
+  color: #000;
+}
+
+/* Icon caret có thể được cải tiến (sử dụng Font Awesome nếu có) */
+.custom-dropdown .dropdown-toggle i.fa-caret-down {
+  margin-left: 5px;
+  font-size: 14px;
+}
+
+/* Dropdown Menu */
+.custom-dropdown .dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  min-width: 200px;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* Dropdown Menu Items */
+.custom-dropdown .dropdown-menu li {
+  border-bottom: 1px solid #eee;
+  width:100%;
+}
+
+.custom-dropdown .dropdown-menu li:last-child {
+  border-bottom: none;
+}
+
+.custom-dropdown .dropdown-menu li a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.custom-dropdown .dropdown-menu li a:hover {
+  background-color: #f2f2f2;
+}
+
+/* Hiển thị menu khi có class active */
+.custom-dropdown.active .dropdown-menu {
+  display: block;
+}
+
 
